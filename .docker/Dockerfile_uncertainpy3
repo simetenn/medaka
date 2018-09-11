@@ -1,0 +1,4 @@
+FROM uncertainpy3
+
+RUN git clone git@github.com:simetenn/uncertainpy.git
+RUN cd uncertainpy; git checkout dev; python setup.py develop --tests
