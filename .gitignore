@@ -1,3 +1,18 @@
+# Figures and data
+*.png
+*.h5
+
+# fish
+.fish
+
+# Neuron files
+# *.mod
+x86_64
+
+# Log files
+.log
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
