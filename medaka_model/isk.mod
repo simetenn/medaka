@@ -27,7 +27,7 @@ UNITS {
 PARAMETER {
 	v (mV)
 	ek = -75 (mV)
-	Cai 	= 5e-5 (mM)			: Initial [Ca]i = 50 nM (Cai is simulated by separate mod-file)
+	Cai 	= 1e-4 (mM)			: Initial [Ca]i = 50 nM (Cai is simulated by separate mod-file)
 	gskbar	= 3.2e-4	(mho/cm2)	: Conductance (can be reset in hoc-file)
 	ks	= 4e-4(mM)		: Middle point of sinf fcn
 }
@@ -47,8 +47,7 @@ ASSIGNED {
 
 BREAKPOINT { 
     sinf = Cai^2/(Cai^2+ks^2)
-    g = gskbar*sinf
-    ik = g * (v - ek)
+    ik = gskbar*sinf*(v - ek)
 }
 
 

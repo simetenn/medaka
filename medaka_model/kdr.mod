@@ -12,7 +12,7 @@ PARAMETER {
         v (mV)
         ek (mV)		: must be explicitely def. in hoc
         celsius		(degC)
-        gkdrbar= 5.1e-4 (mho/cm2)
+        gkdrbar= 4.8e-4 (mho/cm2)
         vlj = 0 (mV) : Added for medaka-cell (shift threshold higher by 0 mV)
         sn = 10 (mV)
         vn = -5 (mV)
@@ -46,7 +46,7 @@ BREAKPOINT {
 
 INITIAL {
 	rates(v+vlj, vn, sn)
-	n=ninf
+	n=0.1
 }
 
 

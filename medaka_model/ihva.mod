@@ -32,7 +32,7 @@ UNITS {
 PARAMETER {
 	v		(mV)
 	celsius	= 36	(degC)
-	eCa     = 70		(mV)
+	eCa     = 60		(mV)
 	Cai 	= .00005	(mM)	: initial [Ca]i = 50 nM
 	Cao 	= 2		(mM)	: [Ca]o = 2 mM
 	pcabar	= 9e-4	(mho/cm2)
@@ -89,7 +89,7 @@ PROCEDURE trates(vm) {
         
         a = trap1(vm, pm1, pm2, pm3)
         b = trap1(-vm, pm4, -pm5, pm6)
-        taum = 1/(a+b)
+        taum = 1/(a+b)/100000
         if (taum<mmin) {taum=mmin}
         m_inf = 1/(1+exp((pm7-vm)/pm8))
 }
