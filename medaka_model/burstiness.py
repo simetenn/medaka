@@ -4,9 +4,9 @@ import numpy as np
 import uncertainpy as un
 
 
-threshold = 0.45                # fraction of the normalized voltage
-burst_threshold = 70            # in ms
-end_threshold = -0.1
+onset_threshold = 0.45          # fraction of the normalized voltage
+burst_threshold = 60            # in ms
+end_threshold = -0.1            # Relative to the onset_threshold
 
 def duration(time, voltage):
     """
@@ -30,11 +30,11 @@ def duration(time, voltage):
     """
 
     # Normalize the voltage
-    new_voltage = voltage - voltage.min()
-    new_voltage /= new_voltage.max()
+    normalized_voltage = voltage - voltage.min()
+    normalized_voltage /= normalized_voltage.max()
 
     # Find spikes in the normalized voltage trace
-    spikes = un.features.Spikes(time, new_voltage, threshold=threshold, end_threshold=end_threshold, trim=False)
+    spikes = un.features.Spikes(time, normalized_voltage, threshold=onset_threshold, end_threshold=end_threshold, trim=False)
 
     # Calculate the duration of each spike
     duration = []

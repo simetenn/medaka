@@ -49,21 +49,21 @@ def scale_conductance(g_x):
 c_scaled = 10*1e-6/A
 alpha_scaled = 0.0015*A*10**6
 
-g_pas_scaled = scale_conductance(0.2)
-gkdrbar_scaled = scale_conductance(3)
-ghvat_scaled = scale_conductance(2)
-gskbar_scaled = scale_conductance(2)
+g_l_scaled = scale_conductance(0.2)
+g_K_scaled = scale_conductance(3)
+g_Ca_scaled = scale_conductance(2)
+g_SK_scaled = scale_conductance(2)
 gbar_naxm = 0
 pcabar_ihva = 3.2e-4
 
 
-def create_soma(g_pas=g_pas_scaled,
-                e_pas=-50,
-                gkdrbar_kdrt=gkdrbar_scaled,
-                ghvat_ihvat=ghvat_scaled,
-                gskbar_sk=gskbar_scaled,
-                gbk_bk=0,
-                ftau_bk=5,
+def create_soma(g_l=g_l_scaled,
+                e_pas=-45,
+                g_K=g_K_scaled,
+                g_Ca=g_Ca_scaled,
+                g_SK=g_SK_scaled,
+                g_BK=0,
+                tau_BK=5,
                 gbar_naxm=gbar_naxm,
                 pcabar_ihva=pcabar_ihva):
     """
@@ -71,22 +71,22 @@ def create_soma(g_pas=g_pas_scaled,
 
     Parameters
     ----------
-    g_pas : float, optional
+    g_l : float, optional
         The leak conductance, in S/cm^2. Default is 6.37e-5 S/cm^2.
     e_pas : float, optional
         Reversal potential for the leak current, in mV. Default is -50 mV.
-    gkdrbar_kdrt : float, optional
+    g_K : float, optional
         The maximal conductance of K channels, in S/cm^2. Default is
-        9.37e-4 S/cm^2.
-    ghvat_ihvat : float, optional
+        9.55e-4 S/cm^2.
+    g_Ca : float, optional
         The maximal conductance of Ca channels, in S/cm^2. Default is
         6.37e-4 S/cm^2.
-    gskbar_sk : float, optional
+    g_SK : float, optional
         The maximal conductance of SK channels, in S/cm^2. Default is
         6.37e-4 S/cm^2.
-    gbk_bk : float, optional
+    g_BK : float, optional
         The maximal conductance of BK channels, in S/cm^2. Default is 0 S/cm^2.
-    ftau_bk : float, optional
+    tau_BK : float, optional
         Time constant of the BK channel, in ms. Default is 5 ms.
     gbar_naxm : float, optional
 
@@ -123,14 +123,14 @@ def create_soma(g_pas=g_pas_scaled,
 
 
         for seg in sec:
-            seg.ftau_bk = ftau_bk
+            seg.ftau_bk = tau_BK
             seg.alpha_Cadt = alpha_scaled
-            seg.g_pas = g_pas
+            seg.g_pas = g_l
             seg.e_pas = e_pas
-            seg.gkdrbar_kdrt = gkdrbar_kdrt # med kun kdrt & nax er 0.001 og 0.05 fine tall
-            seg.ghvat_ihvat = ghvat_ihvat
-            seg.gskbar_sk = gskbar_sk
-            seg.gbk_bk = gbk_bk
+            seg.gkdrbar_kdrt = g_K # med kun kdrt & nax er 0.001 og 0.05 fine tall
+            seg.ghvat_ihvat = g_Ca
+            seg.gskbar_sk = g_SK
+            seg.gbk_bk = g_BK
 
             # TODO Check these
             seg.gbar_naxm = gbar_naxm
@@ -178,7 +178,7 @@ def run_simulation(record_site, stim, simulation_time=5000, noise_amplitude=0):
     simulation_time : {float, int}, optional
         Simulation time in ms. Default is 5000 ms.
     noise_amplitude : float, optional
-        The amplitude of the noise added to the model. If 0, no noise is added.
+        The amplitude of the noise added to the model, in nA. If 0, no noise is added.
         Note that the model uses adaptive timesteps if there is no noise,
         and fixed timesteps with dt=0.25 if there is noise. Default is 0.
 
@@ -253,13 +253,15 @@ def record(record_site):
     return rec_t, rec_v
 
 
-def medaka(g_pas=g_pas_scaled,
-           e_pas=-50,
-           gkdrbar_kdrt=gkdrbar_scaled,
-           ghvat_ihvat=ghvat_scaled,
-           gskbar_sk=gskbar_scaled,
-           gbk_bk=0,
-           ftau_bk=5,
+def medaka(g_l=g_l_scaled,
+           e_pas=-45,
+           g_K=g_K_scaled,
+           g_Ca=g_Ca_scaled,
+           g_SK=g_SK_scaled,
+           g_BK=0,
+           tau_BK=5,
+           gbar_naxm=gbar_naxm,
+           pcabar_ihva=pcabar_ihva,
            simulation_time=5000,
            noise_amplitude=0,
            discard=0):
@@ -268,22 +270,22 @@ def medaka(g_pas=g_pas_scaled,
 
     Parameters
     ----------
-    g_pas : float, optional
+    g_l : float, optional
         The leak conductance, in S/cm^2. Default is 6.37e-5 S/cm^2.
     e_pas : float, optional
         Reversal potential for the leak current, in mV. Default is -50 mV.
-    gkdrbar_kdrt : float, optional
+    g_K : float, optional
         The maximal conductance of K channels, in S/cm^2. Default is
-        9.37e-4 S/cm^2.
-    ghvat_ihvat : float, optional
+        9.55e-4 S/cm^2.
+    g_Ca : float, optional
         The maximal conductance of Ca channels, in S/cm^2. Default is
         6.37e-4 S/cm^2.
-    gskbar_sk : float, optional
+    g_SK : float, optional
         The maximal conductance of SK channels, in S/cm^2. Default is
         6.37e-4 S/cm^2.
-    gbk_bk : float, optional
+    g_BK : float, optional
         The maximal conductance of BK channels, in S/cm^2. Default is 0 S/cm^2.
-    ftau_bk : float, optional
+    tau_BK : float, optional
         Time constant of the BK channel, in ms. Default is 5 ms.
     gbar_naxm : float, optional
 
@@ -294,8 +296,8 @@ def medaka(g_pas=g_pas_scaled,
     simulation_time : {float, int}, optional
         Simulation time in ms. Default is 5000 ms.
     noise_amplitude : float, optional
-        The amplitude of the noise added to the model. If 0, no noise is added.
-        Note that the model uses adaptive timesteps if there is no noise,
+        The amplitude of the noise added to the model, in nA. If 0, no noise is
+        added. Note that the model uses adaptive timesteps if there is no noise,
         and fixed timesteps with dt=0.25 if there is noise. Default is 0.
 
     Returns
@@ -305,13 +307,13 @@ def medaka(g_pas=g_pas_scaled,
     voltage : array
         Voltage array for the simulation.
     """
-    soma = create_soma(g_pas=g_pas,
+    soma = create_soma(g_l=g_l,
                        e_pas=e_pas,
-                       gkdrbar_kdrt=gkdrbar_kdrt,
-                       ghvat_ihvat=ghvat_ihvat,
-                       gskbar_sk=gskbar_sk,
-                       gbk_bk=gbk_bk,
-                       ftau_bk=ftau_bk,
+                       g_K=g_K,
+                       g_Ca=g_Ca,
+                       g_SK=g_SK,
+                       g_BK=g_BK,
+                       tau_BK=tau_BK,
                        gbar_naxm=gbar_naxm,
                        pcabar_ihva=pcabar_ihva)
 

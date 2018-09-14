@@ -92,69 +92,69 @@ def calculate_frequency_bf(**parameters):
 
 
 
-def change_gbk():
+def change_g_BK():
     """
-    Change gbk values and calculate the burstiness factor for each.
+    Change g_BK values and calculate the burstiness factor for each.
 
     Returns
     -------
-    gbks : numpy.array
-        The gbk values in S/cm^2.
+    g_BKs : numpy.array
+        The g_BK values in S/cm^2.
     burstiness_factors : list
-        The burstiness factor for each gbk.
+        The burstiness factor for each g_BK.
     """
-    original_gbks = np.array([0, 0.2, 0.4, 0.5, 0.6, 0.8, 1])
+    original_g_BKs = np.array([0, 0.2, 0.4, 0.5, 0.6, 0.8, 1])
 
-    gbks = scale_conductance(original_gbks)
+    g_BKs = scale_conductance(original_g_BKs)
 
     burstiness_factors = []
 
-    for gbk in gbks:
-        bins, frequency, burstiness_factor = calculate_frequency_bf(gbk_bk=gbk)
+    for g_BK in g_BKs:
+        bins, frequency, burstiness_factor = calculate_frequency_bf(g_BK=g_BK)
         burstiness_factors.append(burstiness_factor)
 
-    gbks = original_gbks/1000.
-    return gbks, burstiness_factors
+    g_BKs = original_g_BKs/1000.
+    return g_BKs, burstiness_factors
 
 
 
-def change_ftau():
+def change_tau_BK():
     """
-    Change ftau values and calculate the burstiness factor for each.
+    Change tau_BK values and calculate the burstiness factor for each.
 
     Returns
     -------
-    ftaus : numpy.array
-        The gbk values in S/cm^2.
+    tau_BKs : numpy.array
+        The g_BK values in S/cm^2.
     burstiness_factors : list
-        The burstiness factor for each ftau.
+        The burstiness factor for each tau_BK.
 
     Notes
     -----
-    Uses original gbk => 1.
+    Uses original g_BK => 1.
     """
-    ftaus = np.array([2, 4, 5, 6, 7, 8, 10])
+    tau_BKs = np.array([2, 4, 5, 6, 7, 8, 10])
 
     burstiness_factors = []
-    gbk = scale_conductance(1)
+    g_BK = scale_conductance(1)
 
-    for ftau in ftaus:
-        bins, frequency, burstiness_factor = calculate_frequency_bf(ftau_bk=ftau, gbk_bk=gbk)
+    for tau_BK in tau_BKs:
+        bins, frequency, burstiness_factor = calculate_frequency_bf(tau_BK=tau_BK, g_BK=g_BK)
         burstiness_factors.append(burstiness_factor)
 
-    return ftaus, burstiness_factors
+    return tau_BKs, burstiness_factors
 
 
 
-def robustness(gbk=0):
+def robustness(g_BK=0):
     """
     Calculate the number of occurrences for binned burstiness factor of several
-    model runs with varying conductances (except gbk)
+    model runs with varying conductances (except g_BK)
 
     Parameters
     ----------
-    gbks : float
-        The value of the gbk conductance in S/cm^2.
+    g_BKs : float
+        The value of the g_BK conductance in S/cm^2.
 
 
     Returns
@@ -171,16 +171,16 @@ def robustness(gbk=0):
     hist_range = (0, 1)
 
     # Original values (scaled to the new model)
-    g_pas_scaled = scale_conductance(0.2)
-    gkdrbar_scaled = scale_conductance(3.2)
-    ghvat_scaled = scale_conductance(2)
-    gskbar_scaled = scale_conductance(2)
+    g_l_scaled = scale_conductance(0.2)
+    g_K_scaled = scale_conductance(3.2)
+    g_Ca_scaled = scale_conductance(2)
+    g_SK_scaled = scale_conductance(2)
 
     # Draw conductances from uniform distributions +/- 50% of their original values
-    gkdrbar_kdrt = np.random.uniform(gkdrbar_scaled*0.5, gkdrbar_scaled*1.5, robustness_reruns)
-    ghvat_ihvat = np.random.uniform(ghvat_scaled*0.5, ghvat_scaled*1.5, robustness_reruns)
-    gskbar_sk = np.random.uniform(gskbar_scaled*0.5, gskbar_scaled*1.5, robustness_reruns)
-    g_pas = np.random.uniform(g_pas_scaled*0.5, g_pas_scaled*1.5, robustness_reruns)
+    g_K = np.random.uniform(g_K_scaled*0.5, g_K_scaled*1.5, robustness_reruns)
+    g_Ca = np.random.uniform(g_Ca_scaled*0.5, g_Ca_scaled*1.5, robustness_reruns)
+    g_SK = np.random.uniform(g_SK_scaled*0.5, g_SK_scaled*1.5, robustness_reruns)
+    g_l = np.random.uniform(g_l_scaled*0.5, g_l_scaled*1.5, robustness_reruns)
 
     burstiness_factors = []
 
@@ -190,11 +190,11 @@ def robustness(gbk=0):
         time, voltage = medaka(noise_amplitude=noise_amplitude,
                                discard=discard,
                                simulation_time=simulation_time,
-                               gbk_bk=gbk,
-                               gkdrbar_kdrt=gkdrbar_kdrt[i],
-                               ghvat_ihvat=ghvat_ihvat[i],
-                               gskbar_sk=gskbar_sk[i],
-                               g_pas=g_pas[i])
+                               g_BK=g_BK,
+                               g_K=g_K[i],
+                               g_Ca=g_Ca[i],
+                               g_SK=g_SK[i],
+                               g_l=g_l[i])
 
         event_durations = duration(time, voltage)
 
@@ -219,48 +219,48 @@ def figure_1():
     simulation_time_plot = 5000
 
     # g_bk => 0
-    gbk_bk = scale_conductance(0)
+    g_BK = scale_conductance(0)
     time_0, V_0 = medaka(noise_amplitude=noise_amplitude,
                          discard=discard,
-                         gbk_bk=gbk_bk,
+                         g_BK=g_BK,
                          simulation_time=simulation_time)
 
     event_durations_0 = duration(time_0, V_0)
 
-    bins_0, frequency_0, burstiness_factor_0 = calculate_frequency_bf(gbk_bk=gbk_bk)
+    bins_0, frequency_0, burstiness_factor_0 = calculate_frequency_bf(g_BK=g_BK)
 
     # g_bk => 0.5
-    gbk_bk = scale_conductance(0.5)
+    g_BK = scale_conductance(0.5)
     time_05, V_05 = medaka(noise_amplitude=noise_amplitude,
                            discard=discard,
-                           gbk_bk=gbk_bk,
+                           g_BK=g_BK,
                            simulation_time=simulation_time)
 
     event_durations_05 = duration(time_05, V_05)
 
-    bins_05, frequency_05, burstiness_factor_05 = calculate_frequency_bf(gbk_bk=gbk_bk)
+    bins_05, frequency_05, burstiness_factor_05 = calculate_frequency_bf(g_BK=g_BK)
 
 
 
     # g_bk => 1
-    gbk_bk = scale_conductance(1)
+    g_BK = scale_conductance(1)
     time_1, V_1 = medaka(noise_amplitude=noise_amplitude,
                          discard=discard,
-                         gbk_bk=gbk_bk,
+                         g_BK=g_BK,
                          simulation_time=simulation_time)
 
     event_durations_1 = duration(time_1, V_1)
 
-    bins_1, frequency_1, burstiness_factor_1 = calculate_frequency_bf(gbk_bk=gbk_bk)
+    bins_1, frequency_1, burstiness_factor_1 = calculate_frequency_bf(g_BK=g_BK)
 
 
 
     # Calculate results for figure 1D
-    scaled_gbks, burstiness_factors_gbk = change_gbk()
+    scaled_g_BKs, burstiness_factors_g_BK = change_g_BK()
 
 
     # Calculate results for figure 1E
-    scaled_ftau, burstiness_factors_ftau = change_ftau()
+    scaled_tau_BK, burstiness_factors_tau_BK = change_tau_BK()
 
 
     # Rescale from ms to s
@@ -350,7 +350,7 @@ def figure_1():
     ax6.set_xlabel("Event duration (s)")
 
 
-    ax7.plot(scaled_gbks*1000, burstiness_factors_gbk, marker=".")
+    ax7.plot(scaled_g_BKs*1000, burstiness_factors_g_BK, marker=".")
     ax7.set_xlabel(r"$\rightarrow g_{BK}$ (nS)")
     ax7.set_ylabel("Burstiness")
     ax7.tick_params(axis="both", which="major", labelsize=fontsize, labelcolor="black")
@@ -360,7 +360,7 @@ def figure_1():
     # ax7.set_xlabel(r"$g_{BK}$ (mS/cm$^2$)")
 
 
-    ax8.plot(scaled_ftau, burstiness_factors_ftau, marker=".")
+    ax8.plot(scaled_tau_BK, burstiness_factors_tau_BK, marker=".")
     ax8.set_xlabel(r"$\tau_{BK}$ (ms)")
     ax8.set_ylabel("Burstiness")
     ax8.set_yticks(yticks)
@@ -385,16 +385,16 @@ def figure_2():
     """
 
     # g_bk => 0
-    gbk = scale_conductance(0)
-    bins_0, binned_burstiness_factors_0 = robustness(gbk=gbk)
+    g_BK = scale_conductance(0)
+    bins_0, binned_burstiness_factors_0 = robustness(g_BK=g_BK)
 
     # g => 0.5
-    gbk = scale_conductance(0.5)
-    bins_05, binned_burstiness_factors_05 = robustness(gbk=gbk)
+    g_BK = scale_conductance(0.5)
+    bins_05, binned_burstiness_factors_05 = robustness(g_BK=g_BK)
 
     # g_bk => 1
-    gbk = scale_conductance(1)
-    bins_1, binned_burstiness_factors_1 = robustness(gbk=gbk)
+    g_BK = scale_conductance(1)
+    bins_1, binned_burstiness_factors_1 = robustness(g_BK=g_BK)
 
 
     # Plotting
@@ -441,4 +441,4 @@ def figure_2():
 
 if __name__ == "__main__":
     figure_1()
-    # figure_2()
+    figure_2()

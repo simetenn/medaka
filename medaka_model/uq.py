@@ -26,9 +26,9 @@ noise_amplitude = 0            # in mV
 
 
 def burstiness_robustness():
-    parameters = {"gkdrbar_kdrt": scale_conductance(3.2),
-                  "ghvat_ihvat": scale_conductance(2),
-                  "gskbar_sk": scale_conductance(2),
+    parameters = {"g_K": scale_conductance(3.2),
+                  "g_Ca": scale_conductance(2),
+                  "g_SK": scale_conductance(2),
                   "g_pas": scale_conductance(0.2)}
 
     # Create the parameters
@@ -111,11 +111,11 @@ def burstiness_robustness():
 
 
 def uncertain_gbk():
-    parameters = {"gkdrbar_kdrt": scale_conductance(3.2),
-                  "ghvat_ihvat": scale_conductance(2),
-                  "gskbar_sk": scale_conductance(2),
-                  "g_pas": scale_conductance(0.2),
-                  "gbk_bk": scale_conductance(1)}
+    parameters = {"g_K": scale_conductance(3.2),
+                  "g_Ca": scale_conductance(2),
+                  "g_SK": scale_conductance(2),
+                  "g_l": scale_conductance(0.2),
+                  "g_BK": scale_conductance(1)}
 
     parameters = un.Parameters(parameters)
 
@@ -123,19 +123,19 @@ def uncertain_gbk():
     # # within a 20% interval around their fixed value
     parameters.set_all_distributions(un.uniform(1))
 
-    # parameters["gbk_bk"].distribution = cp.Uniform(scale_conductance(0),
+    # parameters["g_BK"].distribution = cp.Uniform(scale_conductance(0),
     #                                                scale_conductance(1))
 
 
-    # parameters = {"gkdrbar_kdrt": cp.Uniform(scale_conductance(2.8),
+    # parameters = {"g_K": cp.Uniform(scale_conductance(2.8),
     #                                          scale_conductance(3.8)),
-    #               "ghvat_ihvat": cp.Uniform(scale_conductance(1.5),
+    #               "g_Ca": cp.Uniform(scale_conductance(1.5),
     #                                          scale_conductance(2.5)),
-    #               "gskbar_sk": cp.Uniform(scale_conductance(1.4),
+    #               "g_SK": cp.Uniform(scale_conductance(1.4),
     #                                       scale_conductance(2.5)),
-    #               "g_pas": cp.Uniform(scale_conductance(0),
+    #               "g_l": cp.Uniform(scale_conductance(0),
     #                                   scale_conductance(1)),
-    #               "gbk_bk": cp.Uniform(scale_conductance(0),
+    #               "g_BK": cp.Uniform(scale_conductance(0),
     #                                    scale_conductance(1))}
 
     # Initialize the features
