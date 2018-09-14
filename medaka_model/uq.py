@@ -26,10 +26,10 @@ noise_amplitude = 0            # in mV
 
 
 def burstiness_robustness():
-    parameters = {"g_K": scale_conductance(3.2),
+    parameters = {"g_K": scale_conductance(3),
                   "g_Ca": scale_conductance(2),
                   "g_SK": scale_conductance(2),
-                  "g_pas": scale_conductance(0.2)}
+                  "g_l": scale_conductance(0.2)}
 
     # Create the parameters
     parameters = un.Parameters(parameters)
@@ -111,7 +111,7 @@ def burstiness_robustness():
 
 
 def uncertain_gbk():
-    parameters = {"g_K": scale_conductance(3.2),
+    parameters = {"g_K": scale_conductance(3),
                   "g_Ca": scale_conductance(2),
                   "g_SK": scale_conductance(2),
                   "g_l": scale_conductance(0.2),
