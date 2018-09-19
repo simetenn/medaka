@@ -4,7 +4,7 @@ import numpy as np
 import uncertainpy as un
 
 
-onset_threshold = 0.45          # fraction of the normalized voltage
+onset_threshold = 0.55          # fraction of the normalized voltage
 burst_threshold = 60            # in ms
 end_threshold = -0.1            # Relative to the onset_threshold
 
