@@ -49,23 +49,24 @@ def scale_conductance(g_x):
 c_scaled = 10*1e-6/A
 alpha_scaled = 0.0015*A*10**6
 
-g_l_scaled = scale_conductance(0.2)
-g_K_scaled = scale_conductance(3)
-g_Ca_scaled = scale_conductance(2)
-g_SK_scaled = scale_conductance(2)
-gbar_naxm = 0
-pcabar_ihva = 3.2e-4
+
+g_l =  6.37e-5             # S/cm^2
+g_Ca_tabak = 0             # S/cm^2
+g_SK = 6.37e-4             # S/cm^2
+g_Na = 0.07                # S/cm^2
+g_Ca_medaka = 2e-4         # S/cm^2
+g_K = 9.55e-4              # S/cm^2
 
 
-def create_soma(g_l=g_l_scaled,
+def create_soma(g_l=g_l,
                 e_pas=-45,
-                g_K=g_K_scaled,
-                g_Ca=g_Ca_scaled,
-                g_SK=g_SK_scaled,
+                g_K=g_K,
+                g_Ca_tabak=g_Ca_tabak,
+                g_SK=g_SK,
                 g_BK=0,
                 tau_BK=5,
-                gbar_naxm=gbar_naxm,
-                pcabar_ihva=pcabar_ihva):
+                g_Na=g_Na,
+                g_Ca_medaka=g_Ca_medaka):
     """
     Create the soma of a neuron.
 
@@ -78,8 +79,8 @@ def create_soma(g_l=g_l_scaled,
     g_K : float, optional
         The maximal conductance of K channels, in S/cm^2. Default is
         9.55e-4 S/cm^2.
-    g_Ca : float, optional
-        The maximal conductance of Ca channels, in S/cm^2. Default is
+    g_Ca_tabak : float, optional
+        The maximal conductance of Ca channels (tabak version), in S/cm^2. Default is
         6.37e-4 S/cm^2.
     g_SK : float, optional
         The maximal conductance of SK channels, in S/cm^2. Default is
@@ -88,9 +89,11 @@ def create_soma(g_l=g_l_scaled,
         The maximal conductance of BK channels, in S/cm^2. Default is 0 S/cm^2.
     tau_BK : float, optional
         Time constant of the BK channel, in ms. Default is 5 ms.
-    gbar_naxm : float, optional
-
-    pcabar_ihva : float, optional
+    g_Na: float, optional
+        The maximal conductance of Na channels, in S/cm^2. Default is 0.07 S/cm^2.
+    g_Ca_medaka : float, optional
+        The maximal conductance of Ca channels (medaka version), in S/cm^2.
+        Default is 2e-4 S/cm^2.
 
     Returns
     -------
@@ -128,13 +131,13 @@ def create_soma(g_l=g_l_scaled,
             seg.g_pas = g_l
             seg.e_pas = e_pas
             seg.gkdrbar_kdrt = g_K # med kun kdrt & nax er 0.001 og 0.05 fine tall
-            seg.ghvat_ihvat = g_Ca
+            seg.ghvat_ihvat = g_Ca_tabak
             seg.gskbar_sk = g_SK
             seg.gbk_bk = g_BK
 
             # TODO Check these
-            seg.gbar_naxm = gbar_naxm
-            seg.pcabar_ihva = pcabar_ihva
+            seg.gbar_naxm = g_Na
+            seg.pcabar_ihva = g_Ca_medaka
 
     return soma
 
@@ -208,12 +211,6 @@ def run_simulation(record_site, stim, simulation_time=5000, noise_amplitude=0):
         nrn.finitialize(-60)
         neuron.init()
 
-        # wiener Wiener parameters are normally distributed numbers with zero
-        # mean and unit standard deviation. They are useful in stochastic
-        # simulations since they automatically scale with change in the
-        # integration time step. Their names are listed separated by commas or
-        # spaces.
-
         n_steps = int(np.ceil(simulation_time/nrn.dt)) + 1
         noise = noise_amplitude*np.random.normal(size=n_steps)/np.sqrt(nrn.dt)
 
@@ -253,15 +250,15 @@ def record(record_site):
     return rec_t, rec_v
 
 
-def medaka(g_l=g_l_scaled,
+def medaka(g_l=g_l,
            e_pas=-45,
-           g_K=g_K_scaled,
-           g_Ca=g_Ca_scaled,
-           g_SK=g_SK_scaled,
+           g_K=9.55e-4,
+           g_Ca_tabak=g_Ca_tabak,
+           g_SK=g_SK,
            g_BK=0,
            tau_BK=5,
-           gbar_naxm=gbar_naxm,
-           pcabar_ihva=pcabar_ihva,
+           g_Na=g_Na,
+           g_Ca_medaka=g_Ca_medaka,
            simulation_time=5000,
            noise_amplitude=0,
            discard=0):
@@ -277,7 +274,7 @@ def medaka(g_l=g_l_scaled,
     g_K : float, optional
         The maximal conductance of K channels, in S/cm^2. Default is
         9.55e-4 S/cm^2.
-    g_Ca : float, optional
+    g_Ca_tabak : float, optional
         The maximal conductance of Ca channels, in S/cm^2. Default is
         6.37e-4 S/cm^2.
     g_SK : float, optional
@@ -287,9 +284,9 @@ def medaka(g_l=g_l_scaled,
         The maximal conductance of BK channels, in S/cm^2. Default is 0 S/cm^2.
     tau_BK : float, optional
         Time constant of the BK channel, in ms. Default is 5 ms.
-    gbar_naxm : float, optional
+    g_Na : float, optional
 
-    pcabar_ihva : float, optional
+    g_Ca_medaka : float, optional
 
     discard : {float, int}, optional
         The first ms of the simulation to be discarded. Default is 0 ms.
@@ -310,12 +307,12 @@ def medaka(g_l=g_l_scaled,
     soma = create_soma(g_l=g_l,
                        e_pas=e_pas,
                        g_K=g_K,
-                       g_Ca=g_Ca,
+                       g_Ca_tabak=g_Ca_tabak,
                        g_SK=g_SK,
                        g_BK=g_BK,
                        tau_BK=tau_BK,
-                       gbar_naxm=gbar_naxm,
-                       pcabar_ihva=pcabar_ihva)
+                       g_Na=g_Na,
+                       g_Ca_medaka=g_Ca_medaka)
 
 
     stim = insert_current_clamp(soma(0.5), simulation_time=simulation_time)
@@ -334,6 +331,7 @@ if __name__ == '__main__':
     time, V = medaka()
 
     plt.style.use("seaborn-darkgrid")
+    plt.figure()
     plt.plot(time, V)
     plt.savefig("voltage.png")
 
