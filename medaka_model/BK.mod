@@ -7,7 +7,7 @@ NEURON {
     SUFFIX bk
     USEION k READ ek WRITE ik
     GLOBAL finf
-    RANGE gbk, ftau
+    RANGE gbk, ftau, vf
 }
 
 PARAMETER {
