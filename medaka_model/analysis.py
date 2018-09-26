@@ -113,9 +113,11 @@ def change_g_BK(**parameters):
     burstiness_factors : list
         The burstiness factor for each g_BK.
     """
-    original_g_BKs = np.arange(0, 1.1, 0.1)
+    # original_g_BKs = np.arange(0, 1.1, 0.1)
 
-    g_BKs = scale_conductance(original_g_BKs)
+    # g_BKs = scale_conductance(original_g_BKs)
+
+    g_BKs = np.arange(0.05, 0.31, 0.01)/1000
 
     burstiness_factors = []
 
@@ -242,12 +244,12 @@ def figure_1():
 
     # Tabak
     time_0_tabak, V_0_tabak = medaka(noise_amplitude=noise_amplitude,
-                         discard=discard,
-                         g_BK=g_BK,
-                         g_Ca_tabak=6.37e-4,
-                         g_Na=0,
-                         g_Ca=0,
-                         simulation_time=simulation_time)
+                                     discard=discard,
+                                     g_BK=g_BK,
+                                     g_Ca_tabak=6.37e-4,
+                                     g_Na=0,
+                                     g_Ca=0,
+                                     simulation_time=simulation_time)
 
     bins_0_tabak, frequency_0_tabak, burstiness_factor_0_tabak = calculate_frequency_bf(g_BK=g_BK,
                                                                                         g_Ca_tabak=6.37e-4,
@@ -281,32 +283,6 @@ def figure_1():
                                                                                            g_Na=0,
                                                                                            g_Ca=0)
 
-
-    # g_bk => 0.65
-    g_BK = scale_conductance(0.7)
-    # Medak
-    time_065, V_065 = medaka(noise_amplitude=noise_amplitude,
-                           discard=discard,
-                           g_BK=g_BK,
-                           simulation_time=simulation_time)
-
-    bins_065, frequency_065, burstiness_factor_065 = calculate_frequency_bf(g_BK=g_BK)
-
-    # Tabak
-    time_065_tabak, V_065_tabak = medaka(noise_amplitude=noise_amplitude,
-                         discard=discard,
-                         g_BK=g_BK,
-                         g_Ca_tabak=6.37e-4,
-                         g_Na=0,
-                         g_Ca=0,
-                         simulation_time=simulation_time)
-
-    bins_065_tabak, frequency_065_tabak, burstiness_factor_065_tabak = calculate_frequency_bf(g_BK=g_BK,
-                                                                                              g_Ca_tabak=6.37e-4,
-                                                                                              g_Na=0,
-                                                                                              g_Ca=0)
-
-
     # g_bk => 1
     g_BK = scale_conductance(1)
     # Medaka
@@ -319,11 +295,11 @@ def figure_1():
 
     # Tabak
     time_1_tabak, V_1_tabak = medaka(noise_amplitude=noise_amplitude,
-                         discard=discard,
-                         g_BK=g_BK,
-                         g_Ca_tabak=6.37e-4,
-                         g_Na=0,
-                         simulation_time=simulation_time)
+                                     discard=discard,
+                                     g_BK=g_BK,
+                                     g_Ca_tabak=6.37e-4,
+                                     g_Na=0,
+                                     simulation_time=simulation_time)
 
     bins_1_tabak, frequency_1_tabak, burstiness_factor_1_tabak = calculate_frequency_bf(g_BK=g_BK,
                                                                                         g_Ca_tabak=6.37e-4,
@@ -340,15 +316,15 @@ def figure_1():
 
 
 
-    # Calculate results for figure 1E
-    # Medaka
-    scaled_tau_BK, burstiness_factors_tau_BK = change_tau_BK(g_BK=scale_conductance(0))
+    # # Calculate results for figure 1E
+    # # Medaka
+    # scaled_tau_BK, burstiness_factors_tau_BK = change_tau_BK(g_BK=scale_conductance(0))
 
-    # Tabak
-    scaled_tau_BK_tabak, burstiness_factors_tau_BK_tabak = change_tau_BK(g_Ca_tabak=6.37e-4,
-                                                                         g_Na=0,
-                                                                         g_Ca=0,
-                                                                         g_BK=scale_conductance(1))
+    # # Tabak
+    # scaled_tau_BK_tabak, burstiness_factors_tau_BK_tabak = change_tau_BK(g_Ca_tabak=6.37e-4,
+    #                                                                      g_Na=0,
+    #                                                                      g_Ca=0,
+    #                                                                      g_BK=scale_conductance(1))
 
 
     # Plotting
@@ -364,8 +340,8 @@ def figure_1():
     ax5 = plt.subplot(gs[1, -2:])
     ax6 = plt.subplot(gs[2, -2:])
 
-    ax7 = plt.subplot(gs[3, :3])
-    ax8 = plt.subplot(gs[3, 3:])
+    ax7 = plt.subplot(gs[3, 1:-1])
+    # ax8 = plt.subplot(gs[3, 3:])
 
 
     voltage_axes = [ax1, ax2, ax3]
@@ -377,14 +353,14 @@ def figure_1():
     ax1.plot(time_0, V_0, color="tab:blue")
     title = r"$g_{BK} = " + "{:.2f}".format(scale_conductance(0)*1000) + r"$ (mS/cm$^2$)"
     ax1.set_title(title)
-    ax1.get_xaxis().set_visible(False)
+    # ax1.get_xaxis().set_visible(False)
     ax1.text(label_x, label_y, r"\textbf{A}", transform=ax1.transAxes, fontsize=titlesize)
 
     ax2.plot(time_05_tabak, V_05_tabak, color="tab:gray")
     ax2.plot(time_05, V_05, color="tab:blue")
     title = r"$g_{BK} = " + "{:.2f}".format(scale_conductance(0.5)*1000) + r"$ (mS/cm$^2$) "
     ax2.set_title(title)
-    ax2.get_xaxis().set_visible(False)
+    # ax2.get_xaxis().set_visible(False)
     ax2.text(label_x, label_y, r"\textbf{B}", transform=ax2.transAxes, fontsize=titlesize)
 
 
@@ -479,21 +455,21 @@ def figure_1():
     # ax7.set_xlabel(r"$g_{BK}$ (mS/cm$^2$)")
 
 
-    ax8.plot(scaled_tau_BK_tabak, burstiness_factors_tau_BK_tabak, marker=".", color="tab:grey")
-    ax8.plot(scaled_tau_BK, burstiness_factors_tau_BK, marker=".", color="tab:blue")
-    ax8.set_xlabel(r"$\tau_{BK}$ (ms)")
-    ax8.set_ylabel("Burstiness")
-    ax8.set_yticks(yticks)
-    ax8.tick_params(axis="both", which="major", labelsize=fontsize, labelcolor="black")
-    ax8.set_ylim([-0.05, 1.05])
+    # ax8.plot(scaled_tau_BK_tabak, burstiness_factors_tau_BK_tabak, marker=".", color="tab:grey")
+    # ax8.plot(scaled_tau_BK, burstiness_factors_tau_BK, marker=".", color="tab:blue")
+    # ax8.set_xlabel(r"$\tau_{BK}$ (ms)")
+    # ax8.set_ylabel("Burstiness")
+    # ax8.set_yticks(yticks)
+    # ax8.tick_params(axis="both", which="major", labelsize=fontsize, labelcolor="black")
+    # ax8.set_ylim([-0.05, 1.05])
     # ax8.set_xlim([2, 20])
 
     ax7.text(label_x, label_y, r"\textbf{D}", transform=ax7.transAxes, fontsize=titlesize)
-    ax8.text(label_x, label_y, r"\textbf{E}", transform=ax8.transAxes, fontsize=titlesize)
+    # ax8.text(label_x, label_y, r"\textbf{E}", transform=ax8.transAxes, fontsize=titlesize)
 
 
-    rat_legend = Patch(facecolor="tab:grey", label="Rat")
-    fish_legend = Patch(facecolor="tab:blue", label="Medaka 1")
+    rat_legend = Patch(facecolor="tab:grey", label="RAT")
+    fish_legend = Patch(facecolor="tab:blue", label="MEDAKA 1")
     plt.legend(handles=[rat_legend, fish_legend],
                bbox_to_anchor=(0.65, 1),
                bbox_transform=plt.gcf().transFigure,
