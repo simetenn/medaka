@@ -147,7 +147,7 @@ def create_soma(g_l=g_l,
     return soma
 
 
-def insert_current_clamp(input_site, simulation_time=5000):
+def insert_current_clamp(input_site, duration=5000, delay=0, amplitude=0):
     """
     Inserts a current clamp in the neuron model.
 
@@ -156,8 +156,12 @@ def insert_current_clamp(input_site, simulation_time=5000):
     input_site : neuron.Segment
         Where to place the current clamp. Example: soma(0.5), where 0.5 means 'center',
         0 would mean start, and 1 would mean at the end of the segment in question.
-    simulation_time : {float, int}, optional
-        Simulation time in ms. Default is 5000 ms.
+    duration : {float, int}, optional
+        Duration of stimulus in ms. Default is 5000 ms.
+    delay:
+        Delay of stimulus in ms. Default is 0 ms.
+    amplitude:
+        Amplitude of stimulus in nA. Default is 0 nA.
 
     Returns
     -------
@@ -166,14 +170,14 @@ def insert_current_clamp(input_site, simulation_time=5000):
         lost.
     """
     stim = nrn.IClamp(input_site)
-    stim.delay = 0
-    stim.dur = simulation_time
-    stim.amp = 0
+    stim.delay = delay
+    stim.dur = duration
+    stim.amp = amplitude
 
     return stim
 
 
-def run_simulation(record_site, stim, simulation_time=5000, noise_amplitude=0):
+def run_simulation(soma, simulation_time=5000, noise_amplitude=0):
     """
     Runs the NEURON simulation.
 
@@ -197,7 +201,7 @@ def run_simulation(record_site, stim, simulation_time=5000, noise_amplitude=0):
     voltage : array
         Voltage array for the simulation.
     """
-    rec_t, rec_v = record(record_site)
+    rec_t, rec_v = record(soma(0.5))
 
     cvode = nrn.CVode()
 
@@ -212,6 +216,8 @@ def run_simulation(record_site, stim, simulation_time=5000, noise_amplitude=0):
     else:
         cvode.active(0)
 
+        noise_stim = insert_current_clamp(soma(0.5), duration=simulation_time)
+
         nrn.dt = 0.25
         nrn.finitialize(-60)
         neuron.init()
@@ -222,7 +228,7 @@ def run_simulation(record_site, stim, simulation_time=5000, noise_amplitude=0):
         # Add noise
         i = 0
         while nrn.t < simulation_time:
-            stim.amp = noise[i]
+            noise_stim.amp = noise[i]
             nrn.fadvance()
 
             i += 1
@@ -268,6 +274,7 @@ def medaka(g_l=g_l,
            vf=vf,
            simulation_time=5000,
            noise_amplitude=0,
+           stimulus_amplitude=0,
            discard=0):
     """
     Neuron model of medaka cell
@@ -304,6 +311,8 @@ def medaka(g_l=g_l,
         The amplitude of the noise added to the model, in nA. If 0, no noise is
         added. Note that the model uses adaptive timesteps if there is no noise,
         and fixed timesteps with dt=0.25 if there is noise. Default is 0.
+    stimulus_amplitude : float, optional
+        The amplitude of the stimulus added to the model, in nA. Default is 0.
 
     Returns
     -------
@@ -324,12 +333,14 @@ def medaka(g_l=g_l,
                        taun=taun,
                        vf=vf)
 
+    stim = insert_current_clamp(soma(0.5),
+                                duration=simulation_time,
+                                amplitude=stimulus_amplitude)
 
-    stim = insert_current_clamp(soma(0.5), simulation_time=simulation_time)
-
-    time, voltage = run_simulation(soma(0.5), stim,
+    time, voltage = run_simulation(soma,
                                    simulation_time=simulation_time,
                                    noise_amplitude=noise_amplitude)
+
 
     return time[time > discard], voltage[time > discard]
 
