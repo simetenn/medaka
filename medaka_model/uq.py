@@ -295,6 +295,203 @@ def burstiness_robustness():
 
 
 
+
+
+
+
+
+def burstiness_tabak_vs_medaka():
+
+    # Tabak
+    parameters = {"g_K": 9.55e-4,
+                  "g_Ca_tabak": 6.37e-4,
+                  "g_SK": 6.37e-4,
+                  "g_l": 6.37e-5,
+                  "g_BK": scale_conductance(0.67)}
+
+    parameters = un.Parameters(parameters)
+
+    # Set all parameters to have a uniform distribution
+    parameters.set_all_distributions(un.uniform(1))
+
+    # Initialize the features
+    features = un.SpikingFeatures(new_features=burstiness_factor,
+                                  features_to_run="burstiness_factor",
+                                  logger_level="error",
+                                  strict=False,
+                                  threshold=0.55,
+                                  end_threshold=-0.1,
+                                  normalize=True,
+                                  trim=False)
+
+
+    # Initialize the Tabak model and defining default options
+    model = un.NeuronModel(file="medaka.py",
+                           name="medaka",
+                           discard=discard,
+                           noise_amplitude=noise_amplitude,
+                           simulation_time=simulation_time,
+                           ignore=True,
+                           g_Na=0,
+                           g_Ca=0,
+                           stimulus_amplitude=0.0015)
+
+    # Perform the uncertainty quantification
+    UQ = un.UncertaintyQuantification(model,
+                                      parameters=parameters,
+                                      features=features)
+    data_tabak = UQ.quantify(seed=10,
+                             plot="all",
+                             figure_folder="tabak",
+                             filename="tabak",
+                             polynomial_order=5)
+
+
+    # Medaka
+    parameters = {"g_K": 9.55e-4,
+                  "g_Ca": 2e-4,
+                  "g_SK": 6.37e-4,
+                  "g_Na": 0.07,
+                  "g_l": 6.37e-5,
+                  "g_BK": scale_conductance(0.67)}
+
+    parameters = un.Parameters(parameters)
+
+    # Set all parameters to have a uniform distribution
+    parameters.set_all_distributions(un.uniform(1))
+
+
+    # Initialize the Medaka model and defining default options
+    model = un.NeuronModel(file="medaka.py",
+                           name="medaka",
+                           discard=discard,
+                           noise_amplitude=noise_amplitude,
+                           simulation_time=simulation_time,
+                           ignore=True,
+                           stimulus_amplitude=0.0015)
+
+    # Perform the uncertainty quantification
+    UQ = un.UncertaintyQuantification(model,
+                                      parameters=parameters,
+                                      features=features)
+
+    # We set the seed to easier be able to reproduce the result
+    data_medaka= UQ.quantify(seed=10,
+                             figure_folder="medaka_1_stim",
+                             filename="medaka_1_stim",
+                             plot="all",
+                             polynomial_order=5)
+
+
+
+
+    # Plotting
+    style = "seaborn-darkgrid"
+    set_style(style)
+    set_latex_font()
+
+    plt.rcParams.update({"axes.titlepad": 8})
+    fig, axes = plt.subplots(nrows=1, ncols=2, squeeze=False, sharex="col", sharey="row",
+                             figsize=(figure_width, figure_width*0.4))
+
+    ax1 = axes[0][0]
+    ax2 = axes[0][1]
+
+    ax1.set_ylabel("Total-order Sobol indices", labelpad=30, fontsize=labelsize)
+
+
+    width = 0.2
+
+    latex_labels = {"g_K": r"$g_\mathrm{K}$",
+                    "g_Ca": r"$g_\mathrm{Ca}$",
+                    "g_Ca_tabak": r"$g_\mathrm{Ca}$",
+                    "g_SK": r"$g_\mathrm{SK}$",
+                    "g_Na": r"$g_\mathrm{Na}$",
+                    "g_l": r"$g_\mathrm{l}$",
+                    "g_BK": r"$g_\mathrm{BK}$"
+    }
+
+
+
+
+    # Tabak
+    xlabels = []
+    for label in data_tabak.uncertain_parameters:
+        xlabels.append(latex_labels[label])
+
+    index = np.arange(1, len(data_tabak.uncertain_parameters)+1)*width
+
+
+    sensitivity = data_tabak["burstiness_factor"].sobol_total_average
+    mean = data_tabak["burstiness_factor"].mean
+    std = np.sqrt(data_tabak["burstiness_factor"].variance)
+
+    prettyBar(sensitivity,
+              xlabels=xlabels,
+              title="Tabak",
+              nr_colors=len(data_tabak.uncertain_parameters),
+              index=index,
+              ax=ax1,
+              style=style)
+
+    for tick in ax1.get_xticklabels():
+        tick.set_rotation(-40)
+
+    ax1.set_ylim([0, 1])
+    # ax1.set_title(title, fontsize=titlesize)
+    ax1.text(-0.08, 1.08, R"\textbf{A}", transform=ax1.transAxes, fontsize=titlesize)
+
+    ax1.text(0.38, 0.9, "Mean = {mean:.2{c}}".format(mean=mean, c="e" if abs(mean) < 1e-2 else "f"),
+            transform=ax1.transAxes, fontsize=labelsize)
+    ax1.text(0.38, 0.8, "Std. = {std:.2{c}}".format(std=std, c="e" if abs(mean) < 1e-2 else "f"),
+            transform=ax1.transAxes, fontsize=labelsize)
+
+    ax1.tick_params(labelsize=fontsize)
+
+
+
+    # Medaka
+    xlabels = []
+    for label in data_medaka.uncertain_parameters:
+        xlabels.append(latex_labels[label])
+
+    index = np.arange(1, len(data_medaka.uncertain_parameters)+1)*width
+
+
+    sensitivity = data_medaka["burstiness_factor"].sobol_total_average
+    mean = data_medaka["burstiness_factor"].mean
+    std = np.sqrt(data_medaka["burstiness_factor"].variance)
+
+    prettyBar(sensitivity,
+              xlabels=xlabels,
+              title="Medaka",
+              nr_colors=len(data_medaka.uncertain_parameters),
+              index=index,
+              ax=ax2,
+              style=style)
+
+    for tick in ax2.get_xticklabels():
+        tick.set_rotation(-40)
+
+    ax2.set_ylim([0, 1.15])
+    ax2.text(-0.08, 1.08, R"\textbf{B}", transform=ax2.transAxes, fontsize=titlesize)
+
+    ax2.text(0.38, 0.9, "Mean = {mean:.2{c}}".format(mean=mean, c="e" if abs(mean) < 1e-2 else "f"),
+            transform=ax2.transAxes, fontsize=labelsize)
+    ax2.text(0.38, 0.8, "Std. = {std:.2{c}}".format(std=std, c="e" if abs(mean) < 1e-2 else "f"),
+            transform=ax2.transAxes, fontsize=labelsize)
+
+    ax2.tick_params(labelsize=fontsize)
+
+
+    plt.tight_layout()
+    plt.savefig("tabak_vs_medaka" + figure_format)
+
+    plt.rcdefaults()
+
+
+
+
 def uncertain_tabak():
     parameters = {"g_K": 9.55e-4,
                   "g_Ca_tabak": 6.37e-4,
@@ -329,7 +526,8 @@ def uncertain_tabak():
                            simulation_time=simulation_time,
                            ignore=True,
                            g_Na=0,
-                           g_Ca=0)
+                           g_Ca=0,
+                           stimulus_amplitude=0.0015)
 
     # Perform the uncertainty quantification
     UQ = un.UncertaintyQuantification(model,
@@ -378,12 +576,6 @@ def uncertain_medaka():
                                   end_threshold=-0.1,
                                   normalize=True,
                                   trim=False)
-
-    # efel_features_to_run = ["burst_mean_freq", "AP_width", "spike_width2", "burstiness_efel"]
-
-    # features = un.EfelFeatures(features_to_run=efel_features_to_run,
-    #                            new_features=burstiness_efel,
-    #                            strict=False, logger_level="error")
 
     # Initialize the model and defining default options
     model = un.NeuronModel(file="medaka.py",
@@ -447,11 +639,6 @@ def uncertain_medaka_2():
     # Set all parameters to have a uniform distribution
     parameters.set_all_distributions(un.uniform(1))
 
-    # parameters["g_Na"].distribution = cp.Uniform(0.07,
-    # #                                            0.07+0.07*percentage/2)
-
-    # parameters["g_Na"].distribution = None
-
     # Initialize the features
     features = un.SpikingFeatures(new_features=[burstiness_factor, spikiness_factor],
                                   features_to_run=features_to_run,
@@ -461,12 +648,6 @@ def uncertain_medaka_2():
                                   end_threshold=-0.1,
                                   normalize=True,
                                   trim=False)
-
-    # efel_features_to_run = ["burst_mean_freq", "AP_width", "spike_width2", "burstiness_efel"]
-
-    # features = un.EfelFeatures(features_to_run=efel_features_to_run,
-    #                            new_features=burstiness_efel,
-    #                            strict=False, logger_level="error")
 
     # Initialize the model and defining default options
     model = un.NeuronModel(file="medaka.py",
@@ -518,6 +699,7 @@ def uncertain_medaka_2():
 
 if __name__ == "__main__":
     # burstiness_robustness()
-    uncertain_tabak()
-    uncertain_medaka()
+    burstiness_tabak_vs_medaka()
+    # uncertain_tabak()
+    # uncertain_medaka()
     uncertain_medaka_2()
