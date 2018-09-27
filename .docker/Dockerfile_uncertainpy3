@@ -1,4 +1,6 @@
-FROM uncertainpy3
+FROM python3
 
-RUN git clone git@github.com:simetenn/uncertainpy.git
+RUN git clone https://github.com/simetenn/uncertainpy.git
 RUN cd uncertainpy; git checkout dev; python setup.py develop --tests
+
+ENTRYPOINT cd medaka/medaka_model; nrnivmodl; cd .. && bash
