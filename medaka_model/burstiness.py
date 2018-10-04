@@ -28,13 +28,13 @@ def duration(time, voltage):
     -----
     Normalizes the voltage before the spikes are calculated.
     """
-
-    # Normalize the voltage
-    normalized_voltage = voltage - voltage.min()
-    normalized_voltage /= normalized_voltage.max()
-
     # Find spikes in the normalized voltage trace
-    spikes = un.features.Spikes(time, normalized_voltage, threshold=onset_threshold, end_threshold=end_threshold, trim=False)
+    spikes = un.features.Spikes(time,
+                                voltage,
+                                threshold=onset_threshold,
+                                end_threshold=end_threshold,
+                                trim=False,
+                                normalize=True)
 
     # Calculate the duration of each spike
     duration = []
@@ -45,7 +45,7 @@ def duration(time, voltage):
 
 
 
-def burstiness(event_durations, burst_threshold=70):
+def burstiness(event_durations, burst_threshold=60):
     """
     Calculate the burstiness from a series of event durations by finding the
     fraction of events that is above `burst_threshold`.
