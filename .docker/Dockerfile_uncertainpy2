@@ -1,4 +1,4 @@
-FROM python2
+FROM python_medaka2
 
 RUN git clone https://github.com/simetenn/uncertainpy.git
 RUN cd uncertainpy; git checkout dev; python setup.py develop --tests
