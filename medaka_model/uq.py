@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import string
 
 from medaka import scale_conductance
-from burstiness import burstiness_factor, burstiness_efel
+from burstiness import burstiness_factor, bursting, spiking, APs
 
 from uncertainpy.plotting.prettyplot.prettyplot import prettyBar, set_latex_font, set_style, spines_color, prettyPlot, create_figure
 
@@ -24,42 +24,13 @@ figure_format = ".eps"
 discard = 1000                 # in ms
 simulation_time = 11000        # in ms
 noise_amplitude = 0            # in mV
-stimulus_amplitude = 0.000     # in nA
+stimulus_amplitude = 0.000    # in nA
 
+# Uncertainty quantification parameters
+polynomial_order = 3
 features_to_run = ["burstiness_factor", "spike_rate", "average_AP_overshoot",
-                   "average_AHP_depth", "average_duration", "spikiness_factor"]
-
-
-
-def spikiness_factor(time, spikes, info):
-    """
-
-    Parameters
-    ----------
-    time : {None, numpy.nan, array_like}
-        Time values of the model. If no time values it is None or numpy.nan.
-    spikes : uncertainpy.Spikes
-        Spikes found in the model result.
-    info : dictionary
-        Not used, but is required as input
-
-    Returns
-    -------
-    time : None
-    burstiness_factor : int
-        If there are any spikes in the voltage trace.
-
-
-    Calculate the spikiness_factor from a uncertainpy.Spikes object.
-    Compatible with uncertainpy.SpikingFeatures.
-    """
-    flag = 0
-    if spikes.nr_spikes > 0:
-        flag = 1
-
-    return None, flag
-
-
+                   "average_AHP_depth", "average_duration", "spiking", "bursting",
+                   "APs"]
 
 
 def str_to_latex(text):
@@ -70,27 +41,137 @@ def str_to_latex(text):
         return text
 
 
-def list_to_latex(texts):
-    tmp = []
-    for txt in texts:
-        tmp.append(str_to_latex(txt))
+# def plot_sobol(data, data_stim, filename):
 
-    return tmp
+#     withouth_stim = ["spikiness_factor", "spike_rate"]
+
+#     features =  ["spike_rate", "spikiness_factor", "burstiness_factor", "average_duration",
+#                  "average_AP_overshoot", "average_AHP_depth"]
+
+#     nr_plots = len(features)
+#     grid_size = np.ceil(np.sqrt(nr_plots))
+#     grid_x_size = int(grid_size)
+#     grid_y_size = int(np.ceil(nr_plots/float(grid_x_size)))
+
+#     style = "seaborn-darkgrid"
+
+#     set_style(style)
+
+#     set_latex_font()
+#     plt.rcParams.update({"axes.titlepad": 8})
+#     fig, axes = plt.subplots(nrows=grid_y_size, ncols=grid_x_size, squeeze=False, sharex='col', sharey='row',
+#                              figsize=(figure_width, figure_width*0.8))
 
 
-def plot_sobol(data, data_stim, filename):
+#     # Add a larger subplot to use to set a common xlabel and ylabel
+#     set_style("seaborn-white")
+#     ax = fig.add_subplot(111, zorder=-10)
+#     spines_color(ax, edges={"top": "None", "bottom": "None",
+#                             "right": "None", "left": "None"})
+#     ax.tick_params(top='off', bottom='off', left='off', right='off', labelsize=fontsize,
+#                 labelbottom=False, labelleft=False)
+#     ax.set_ylabel('Total-order Sobol indices', labelpad=30, fontsize=labelsize)
 
-    withouth_stim = ["spikiness_factor", "spike_rate"]
 
-    features =  ["spike_rate", "spikiness_factor", "burstiness_factor", "average_duration",
-                 "average_AP_overshoot", "average_AHP_depth"]
+#     width = 0.2
+#     index = np.arange(1, len(data.uncertain_parameters)+1)*width
+
+
+#     latex_labels = {"g_K": r"$g_\mathrm{K}$",
+#                     "g_Ca": r"$g_\mathrm{Ca}$",
+#                     "g_Ca_tabak": r"$g_\mathrm{Ca}$",
+#                     "g_SK": r"$g_\mathrm{SK}$",
+#                     "g_Na": r"$g_\mathrm{Na}$",
+#                     "g_l": r"$g_\mathrm{l}$",
+#                     "g_BK": r"$g_\mathrm{BK}$"
+#     }
+
+#     xlabels = []
+#     for label in data.uncertain_parameters:
+#         xlabels.append(latex_labels[label])
+
+
+
+#     for i in range(0, grid_x_size*grid_y_size):
+#         nx = i % grid_x_size
+#         ny = int(np.floor(i/float(grid_x_size)))
+
+#         ax = axes[ny][nx]
+
+#         if i < nr_plots:
+#             if features[i] == "medaka":
+#                 title = "Membrane potential"
+#             else:
+#                 title = features[i].replace("_", " ")
+#                 title = title[0].upper() + title[1:]
+
+#             if features[i] in withouth_stim:
+#                 sensitivity = data[features[i]].sobol_total_average
+#                 mean = data[features[i]].mean
+#                 std = np.sqrt(data[features[i]].variance)
+#                 unit = data[features[i]].labels
+#             else:
+#                 sensitivity = data_stim[features[i]].sobol_total_average
+#                 mean = data_stim[features[i]].mean
+#                 std = np.sqrt(data_stim[features[i]].variance)
+#                 unit = data_stim[features[i]].labels
+
+
+#             if len(unit) > 0 and "(" in unit[0]:
+#                 unit = unit[0].split("(")[-1].strip(")")
+#             else:
+#                 unit = ""
+
+#             if features[i] == "spike_rate":
+#                 mean *= 1000
+#                 std *= 1000
+#                 unit = "Hz"
+
+#             prettyBar(sensitivity,
+#                       xlabels=xlabels,
+#                       nr_colors=len(data.uncertain_parameters),
+#                       index=index,
+#                       ax=ax,
+#                       # palette="husl",
+#                       style=style)
+
+#             for tick in ax.get_xticklabels():
+#                 tick.set_rotation(-40)
+
+#             ax.set_ylim([0, 1.15])
+#             # ax.set_title("({}) ".format(string.ascii_uppercase[i]) + title, fontsize=titlesize)
+#             ax.set_title(title, fontsize=titlesize)
+#             ax.text(-0.08, 1.08, "\\textbf{{{}}}".format(string.ascii_uppercase[i]), transform=ax.transAxes, fontsize=titlesize)
+
+#             ax.text(0.2, 0.9, "Mean = {mean:.2{c}} {unit}".format(mean=mean, c="e" if abs(mean) < 1e-2 else "f", unit=unit),
+#                     transform=ax.transAxes, fontsize=labelsize)
+#             ax.text(0.2, 0.8, "Std. = {std:.2{c}} {unit}".format(std=std, c="e" if abs(mean) < 1e-2 else "f", unit=unit),
+#                     transform=ax.transAxes, fontsize=labelsize)
+
+#             #ax.set_xticklabels(xlabels, fontsize=labelsize)
+#             ax.tick_params(labelsize=fontsize)
+#         else:
+#             ax.axis("off")
+
+#     plt.tight_layout()
+#     plt.subplots_adjust(bottom=0.13, left=0.1)
+#     plt.savefig(filename + figure_format)
+
+#     plt.rcdefaults()
+
+
+
+
+def plot_sobol(data, filename):
+
+    features =  ["spike_rate", "burstiness_factor", "average_duration",
+                 "average_AP_overshoot", "average_AHP_depth",
+                 "spiking", "bursting", "APs"]
 
     nr_plots = len(features)
     grid_size = np.ceil(np.sqrt(nr_plots))
     grid_x_size = int(grid_size)
     grid_y_size = int(np.ceil(nr_plots/float(grid_x_size)))
-
-    set_latex_font()
 
     style = "seaborn-darkgrid"
 
@@ -107,7 +188,7 @@ def plot_sobol(data, data_stim, filename):
     ax = fig.add_subplot(111, zorder=-10)
     spines_color(ax, edges={"top": "None", "bottom": "None",
                             "right": "None", "left": "None"})
-    ax.tick_params(top='off', bottom='off', left='off', right='off', labelsize=fontsize,
+    ax.tick_params(top=False, bottom=False, left=False, right=False, labelsize=fontsize,
                 labelbottom=False, labelleft=False)
     ax.set_ylabel('Total-order Sobol indices', labelpad=30, fontsize=labelsize)
 
@@ -144,16 +225,10 @@ def plot_sobol(data, data_stim, filename):
                 title = features[i].replace("_", " ")
                 title = title[0].upper() + title[1:]
 
-            if features[i] in withouth_stim:
-                sensitivity = data[features[i]].sobol_total_average
-                mean = data[features[i]].mean
-                std = np.sqrt(data[features[i]].variance)
-                unit = data[features[i]].labels
-            else:
-                sensitivity = data_stim[features[i]].sobol_total_average
-                mean = data_stim[features[i]].mean
-                std = np.sqrt(data_stim[features[i]].variance)
-                unit = data_stim[features[i]].labels
+            sensitivity = data[features[i]].sobol_total_average
+            mean = data[features[i]].mean
+            std = np.sqrt(data[features[i]].variance)
+            unit = data[features[i]].labels
 
 
             if len(unit) > 0 and "(" in unit[0]:
@@ -200,91 +275,89 @@ def plot_sobol(data, data_stim, filename):
 
 
 
-def burstiness_robustness():
-    parameters = {"g_K": scale_conductance(3),
-                  "g_Ca": scale_conductance(2),
-                  "g_SK": scale_conductance(2),
-                  "g_l": scale_conductance(0.2)}
 
-    # Create the parameters
-    parameters = un.Parameters(parameters)
+# def burstiness_robustness():
+#     parameters = {"g_K": scale_conductance(3),
+#                   "g_Ca": scale_conductance(2),
+#                   "g_SK": scale_conductance(2),
+#                   "g_l": scale_conductance(0.2)}
 
-    # Set all parameters to have a uniform distribution
-    # within a +/- 50% interval around their fixed value
-    parameters.set_all_distributions(un.uniform(1))
+#     # Create the parameters
+#     parameters = un.Parameters(parameters)
 
-
-    # Initialize the features
-    features = un.SpikingFeatures(new_features=burstiness_factor, strict=False,
-                                  logger_level="error", features_to_run="burstiness_factor")
+#     # Set all parameters to have a uniform distribution
+#     # within a +/- 50% interval around their fixed value
+#     parameters.set_all_distributions(un.uniform(1))
 
 
-
-    # g_bk => 0
-    # Initialize the model and defining default options
-    model = un.NeuronModel(file="medaka.py", name="medaka",
-                           discard=discard, noise_amplitude=noise_amplitude,
-                           simulation_time=simulation_time,
-                           gbk_bk=scale_conductance(0))
-
-    # Perform the uncertainty quantification
-    UQ = un.UncertaintyQuantification(model,
-                                      parameters=parameters,
-                                      features=features)
-
-    # We set the seed to easier be able to reproduce the result
-    data_0 = UQ.quantify(seed=10, plot=None)
-
-
-    # g_bk => 0.5
-    # Initialize the model and defining default options
-    model = un.NeuronModel(file="medaka.py", name="medaka",
-                           discard=discard, noise_amplitude=noise_amplitude,
-                           simulation_time=simulation_time,
-                           gbk_bk=scale_conductance(0.5))
-
-    # Switch to the model with new default values
-    UQ.model = model
-
-    # We set the seed to easier be able to reproduce the result
-    data_05 = UQ.quantify(seed=10, plot=None)
-
-
-    # g_bk => 0
-    # Initialize the model and defining default options
-    model = un.NeuronModel(file="medaka.py", name="medaka",
-                           discard=discard, noise_amplitude=noise_amplitude,
-                           simulation_time=simulation_time,
-                           gbk_bk=scale_conductance(1))
-
-    # Switch to the model with new default values
-    UQ.model = model
-
-    # We set the seed to easier be able to reproduce the result
-    data_1 = UQ.quantify(seed=10, plot=None)
-
-
-    # plot the results
-    mean = [data_0["burstiness_factor"].mean,
-            data_05["burstiness_factor"].mean,
-            data_1["burstiness_factor"].mean]
-
-    error = [np.sqrt(data_0["burstiness_factor"].variance),
-             np.sqrt(data_05["burstiness_factor"].variance),
-             np.sqrt(data_1["burstiness_factor"].variance)]
-
-    set_latex_font()
-
-    xlabels = [r"$g_{BK} = 0$ (mS/cm$^2$)" + "\n" + r"$\rightarrow 0$ nS",
-               r"$g_{BK} = 0.16$ (mS/cm$^2$)" + "\n" + r"$\rightarrow 0.5$ nS",
-               r"$g_{BK} = 0.32$ (mS/cm$^2$)" + "\n" + r"$\rightarrow 1$ nS"]
-
-    ax = prettyBar(mean, error, xlabels=xlabels, style="seaborn-darkgrid", color=0, width=0.5, ylabel="Burstiness")
-
-    plt.savefig("burstiness_robustness" + figure_format)
+#     # Initialize the features
+#     features = un.SpikingFeatures(new_features=burstiness_factor, strict=False,
+#                                   logger_level="error", features_to_run="burstiness_factor")
 
 
 
+#     # g_bk => 0
+#     # Initialize the model and defining default options
+#     model = un.NeuronModel(file="medaka.py", name="medaka",
+#                            discard=discard, noise_amplitude=noise_amplitude,
+#                            simulation_time=simulation_time,
+#                            gbk_bk=scale_conductance(0))
+
+#     # Perform the uncertainty quantification
+#     UQ = un.UncertaintyQuantification(model,
+#                                       parameters=parameters,
+#                                       features=features)
+
+#     # We set the seed to easier be able to reproduce the result
+#     data_0 = UQ.quantify(seed=10, plot=None)
+
+
+#     # g_bk => 0.5
+#     # Initialize the model and defining default options
+#     model = un.NeuronModel(file="medaka.py", name="medaka",
+#                            discard=discard, noise_amplitude=noise_amplitude,
+#                            simulation_time=simulation_time,
+#                            gbk_bk=scale_conductance(0.5))
+
+#     # Switch to the model with new default values
+#     UQ.model = model
+
+#     # We set the seed to easier be able to reproduce the result
+#     data_05 = UQ.quantify(seed=10, plot=None)
+
+
+#     # g_bk => 0
+#     # Initialize the model and defining default options
+#     model = un.NeuronModel(file="medaka.py", name="medaka",
+#                            discard=discard, noise_amplitude=noise_amplitude,
+#                            simulation_time=simulation_time,
+#                            gbk_bk=scale_conductance(1))
+
+#     # Switch to the model with new default values
+#     UQ.model = model
+
+#     # We set the seed to easier be able to reproduce the result
+#     data_1 = UQ.quantify(seed=10, plot=None)
+
+
+#     # plot the results
+#     mean = [data_0["burstiness_factor"].mean,
+#             data_05["burstiness_factor"].mean,
+#             data_1["burstiness_factor"].mean]
+
+#     error = [np.sqrt(data_0["burstiness_factor"].variance),
+#              np.sqrt(data_05["burstiness_factor"].variance),
+#              np.sqrt(data_1["burstiness_factor"].variance)]
+
+#     set_latex_font()
+
+#     xlabels = [r"$g_{BK} = 0$ (mS/cm$^2$)" + "\n" + r"$\rightarrow 0$ nS",
+#                r"$g_{BK} = 0.16$ (mS/cm$^2$)" + "\n" + r"$\rightarrow 0.5$ nS",
+#                r"$g_{BK} = 0.32$ (mS/cm$^2$)" + "\n" + r"$\rightarrow 1$ nS"]
+
+#     ax = prettyBar(mean, error, xlabels=xlabels, style="seaborn-darkgrid", color=0, width=0.5, ylabel="Burstiness")
+
+#     plt.savefig("burstiness_robustness" + figure_format)
 
 
 
@@ -293,92 +366,7 @@ def burstiness_robustness():
 
 
 
-
-
-def burstiness_tabak_vs_medaka():
-
-    # Tabak
-    parameters = {"g_K": 9.55e-4,
-                  "g_Ca_tabak": 6.37e-4,
-                  "g_SK": 6.37e-4,
-                  "g_l": 6.37e-5,
-                  "g_BK": scale_conductance(0.67)}
-
-    parameters = un.Parameters(parameters)
-
-    # Set all parameters to have a uniform distribution
-    parameters.set_all_distributions(un.uniform(1))
-
-    # Initialize the features
-    features = un.SpikingFeatures(new_features=burstiness_factor,
-                                  features_to_run="burstiness_factor",
-                                  logger_level="error",
-                                  strict=False,
-                                  threshold=0.55,
-                                  end_threshold=-0.1,
-                                  normalize=True,
-                                  trim=False)
-
-
-    # Initialize the Tabak model and defining default options
-    model = un.NeuronModel(file="medaka.py",
-                           name="medaka",
-                           discard=discard,
-                           noise_amplitude=noise_amplitude,
-                           simulation_time=simulation_time,
-                           ignore=True,
-                           g_Na=0,
-                           g_Ca=0,
-                           stimulus_amplitude=stimulus_amplitude)
-
-    # Perform the uncertainty quantification
-    UQ = un.UncertaintyQuantification(model,
-                                      parameters=parameters,
-                                      features=features)
-    data_tabak = UQ.quantify(seed=10,
-                             plot="all",
-                             figure_folder="tabak",
-                             filename="tabak",
-                             polynomial_order=5)
-
-
-    # Medaka
-    parameters = {"g_K": 9.55e-4,
-                  "g_Ca": 2e-4,
-                  "g_SK": 6.37e-4,
-                  "g_Na": 0.07,
-                  "g_l": 6.37e-5,
-                  "g_BK": scale_conductance(0.67)}
-
-    parameters = un.Parameters(parameters)
-
-    # Set all parameters to have a uniform distribution
-    parameters.set_all_distributions(un.uniform(1))
-
-
-    # Initialize the Medaka model and defining default options
-    model = un.NeuronModel(file="medaka.py",
-                           name="medaka",
-                           discard=discard,
-                           noise_amplitude=noise_amplitude,
-                           simulation_time=simulation_time,
-                           ignore=True,
-                           stimulus_amplitude=stimulus_amplitude)
-
-    # Perform the uncertainty quantification
-    UQ = un.UncertaintyQuantification(model,
-                                      parameters=parameters,
-                                      features=features)
-
-    # We set the seed to easier be able to reproduce the result
-    data_medaka= UQ.quantify(seed=10,
-                             figure_folder="medaka_1_stim",
-                             filename="medaka_1_stim",
-                             plot="all",
-                             polynomial_order=5)
-
-
-
+def plot_compare_feature(feature, filename, tabak, medaka_1, medaka_2):
 
     # Plotting
     style = "seaborn-darkgrid"
@@ -386,14 +374,16 @@ def burstiness_tabak_vs_medaka():
     set_latex_font()
 
     plt.rcParams.update({"axes.titlepad": 8})
-    fig, axes = plt.subplots(nrows=1, ncols=2, squeeze=False, sharex="col", sharey="row",
-                             figsize=(figure_width, figure_width*0.4))
+    fig, axes = plt.subplots(nrows=2, ncols=2, squeeze=False, sharex="col", sharey="row",
+                             figsize=(figure_width, figure_width*0.8))
 
     ax1 = axes[0][0]
     ax2 = axes[0][1]
+    ax3 = axes[1][0]
+
+    axes[1][1].axis("off")
 
     ax1.set_ylabel("Total-order Sobol indices", labelpad=30, fontsize=labelsize)
-
 
     width = 0.2
 
@@ -407,24 +397,22 @@ def burstiness_tabak_vs_medaka():
     }
 
 
-
-
     # Tabak
     xlabels = []
-    for label in data_tabak.uncertain_parameters:
+    for label in tabak.uncertain_parameters:
         xlabels.append(latex_labels[label])
 
-    index = np.arange(1, len(data_tabak.uncertain_parameters)+1)*width
+    index = np.arange(1, len(tabak.uncertain_parameters)+1)*width
 
 
-    sensitivity = data_tabak["burstiness_factor"].sobol_total_average
-    mean = data_tabak["burstiness_factor"].mean
-    std = np.sqrt(data_tabak["burstiness_factor"].variance)
+    sensitivity = tabak[feature].sobol_total_average
+    mean = tabak[feature].mean
+    std = np.sqrt(tabak[feature].variance)
 
     prettyBar(sensitivity,
               xlabels=xlabels,
               title="RAT",
-              nr_colors=len(data_tabak.uncertain_parameters),
+              nr_colors=len(tabak.uncertain_parameters),
               index=index,
               ax=ax1,
               style=style)
@@ -434,7 +422,7 @@ def burstiness_tabak_vs_medaka():
 
     ax1.set_ylim([0, 1])
     # ax1.set_title(title, fontsize=titlesize)
-    ax1.text(-0.08, 1.08, R"\textbf{A}", transform=ax1.transAxes, fontsize=titlesize)
+    ax1.text(-0.08, 1.08, r"\textbf{A}", transform=ax1.transAxes, fontsize=titlesize)
 
     ax1.text(0.38, 0.9, "Mean = {mean:.2{c}}".format(mean=mean, c="e" if abs(mean) < 1e-2 else "f"),
             transform=ax1.transAxes, fontsize=labelsize)
@@ -445,22 +433,22 @@ def burstiness_tabak_vs_medaka():
 
 
 
-    # Medaka
+    # Medaka 1
     xlabels = []
-    for label in data_medaka.uncertain_parameters:
+    for label in medaka_1.uncertain_parameters:
         xlabels.append(latex_labels[label])
 
-    index = np.arange(1, len(data_medaka.uncertain_parameters)+1)*width
+    index = np.arange(1, len(medaka_1.uncertain_parameters)+1)*width
 
 
-    sensitivity = data_medaka["burstiness_factor"].sobol_total_average
-    mean = data_medaka["burstiness_factor"].mean
-    std = np.sqrt(data_medaka["burstiness_factor"].variance)
+    sensitivity = medaka_1[feature].sobol_total_average
+    mean = medaka_1[feature].mean
+    std = np.sqrt(medaka_1[feature].variance)
 
     prettyBar(sensitivity,
               xlabels=xlabels,
               title="MEDAKA 1",
-              nr_colors=len(data_medaka.uncertain_parameters),
+              nr_colors=len(medaka_1.uncertain_parameters),
               index=index,
               ax=ax2,
               style=style)
@@ -469,7 +457,7 @@ def burstiness_tabak_vs_medaka():
         tick.set_rotation(-40)
 
     ax2.set_ylim([0, 1.15])
-    ax2.text(-0.08, 1.08, R"\textbf{B}", transform=ax2.transAxes, fontsize=titlesize)
+    ax2.text(-0.08, 1.08, r"\textbf{B}", transform=ax2.transAxes, fontsize=titlesize)
 
     ax2.text(0.38, 0.9, "Mean = {mean:.2{c}}".format(mean=mean, c="e" if abs(mean) < 1e-2 else "f"),
             transform=ax2.transAxes, fontsize=labelsize)
@@ -479,28 +467,263 @@ def burstiness_tabak_vs_medaka():
     ax2.tick_params(labelsize=fontsize)
 
 
+
+    # Medaka 2
+    xlabels = []
+    for label in medaka_2.uncertain_parameters:
+        xlabels.append(latex_labels[label])
+
+    index = np.arange(1, len(medaka_2.uncertain_parameters)+1)*width
+
+
+    sensitivity = medaka_2[feature].sobol_total_average
+    mean = medaka_2[feature].mean
+    std = np.sqrt(medaka_2[feature].variance)
+
+    prettyBar(sensitivity,
+              xlabels=xlabels,
+              title="MEDAKA 2",
+              nr_colors=len(medaka_2.uncertain_parameters),
+              index=index,
+              ax=ax3,
+              style=style)
+
+    for tick in ax3.get_xticklabels():
+        tick.set_rotation(-40)
+
+    ax3.set_ylim([0, 1.15])
+    ax3.text(-0.08, 1.08, r"\textbf{C}", transform=ax3.transAxes, fontsize=titlesize)
+
+    ax3.text(0.38, 0.9, "Mean = {mean:.2{c}}".format(mean=mean, c="e" if abs(mean) < 1e-2 else "f"),
+            transform=ax3.transAxes, fontsize=labelsize)
+    ax3.text(0.38, 0.8, "Std. = {std:.2{c}}".format(std=std, c="e" if abs(mean) < 1e-2 else "f"),
+            transform=ax3.transAxes, fontsize=labelsize)
+
+    ax3.tick_params(labelsize=fontsize)
+
+
+
+
     plt.tight_layout()
-    plt.savefig("tabak_vs_medaka" + figure_format)
+    plt.savefig(filename + figure_format)
 
     plt.rcdefaults()
 
 
 
 
-def uncertain_tabak():
+# def burstiness_tabak_vs_medaka():
+
+#     # Tabak
+#     parameters = {"g_K": 9.55e-4,
+#                   "g_Ca_tabak": 6.37e-4,
+#                   "g_SK": 6.37e-4,
+#                   "g_l": 6.37e-5,
+#                   "g_BK": 2.4e-4}
+
+#     parameters = un.Parameters(parameters)
+
+#     # Set all parameters to have a uniform distribution
+#     parameters.set_all_distributions(un.uniform(1))
+
+#     # Initialize the features
+#     features = un.SpikingFeatures(new_features=burstiness_factor,
+#                                   features_to_run="burstiness_factor",
+#                                   logger_level="error",
+#                                   strict=False,
+#                                   threshold=0.55,
+#                                   end_threshold=-0.1,
+#                                   normalize=True,
+#                                   trim=False)
+
+
+#     # Initialize the Tabak model and defining default options
+#     model = un.NeuronModel(file="medaka.py",
+#                            name="medaka",
+#                            discard=discard,
+#                            noise_amplitude=noise_amplitude,
+#                            simulation_time=simulation_time,
+#                            ignore=True,
+#                            g_Na=0,
+#                            g_Ca=0,
+#                            stimulus_amplitude=stimulus_amplitude)
+
+#     # Perform the uncertainty quantification
+#     UQ = un.UncertaintyQuantification(model,
+#                                       parameters=parameters,
+#                                       features=features)
+#     data_tabak = UQ.quantify(seed=10,
+#                              plot="all",
+#                              figure_folder="tabak",
+#                              filename="tabak",
+#                              polynomial_order=polynomial_order)
+
+
+#     # Medaka
+#     parameters = {"g_K": 9.55e-4,
+#                   "g_Ca": 2e-4,
+#                   "g_SK": 6.37e-4,
+#                   "g_Na": 0.07,
+#                   "g_l": 6.37e-5,
+#                   "g_BK": 2.4e-4}
+
+#     parameters = un.Parameters(parameters)
+
+#     # Set all parameters to have a uniform distribution
+#     parameters.set_all_distributions(un.uniform(1))
+
+#     parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4)
+
+
+#     # Initialize the Medaka model and defining default options
+#     model = un.NeuronModel(file="medaka.py",
+#                            name="medaka",
+#                            discard=discard,
+#                            noise_amplitude=noise_amplitude,
+#                            simulation_time=simulation_time,
+#                            ignore=True,
+#                            stimulus_amplitude=stimulus_amplitude)
+
+#     # Perform the uncertainty quantification
+#     UQ = un.UncertaintyQuantification(model,
+#                                       parameters=parameters,
+#                                       features=features)
+
+#     # We set the seed to easier be able to reproduce the result
+#     data_medaka= UQ.quantify(seed=10,
+#                              figure_folder="medaka_1_stim",
+#                              filename="medaka_1_stim",
+#                              plot="all",
+#                              polynomial_order=polynomial_order)
+
+
+
+
+#     # Plotting
+#     style = "seaborn-darkgrid"
+#     set_style(style)
+#     set_latex_font()
+
+#     plt.rcParams.update({"axes.titlepad": 8})
+#     fig, axes = plt.subplots(nrows=1, ncols=2, squeeze=False, sharex="col", sharey="row",
+#                              figsize=(figure_width, figure_width*0.4))
+
+#     ax1 = axes[0][0]
+#     ax2 = axes[0][1]
+
+#     ax1.set_ylabel("Total-order Sobol indices", labelpad=30, fontsize=labelsize)
+
+#     width = 0.2
+
+#     latex_labels = {"g_K": r"$g_\mathrm{K}$",
+#                     "g_Ca": r"$g_\mathrm{Ca}$",
+#                     "g_Ca_tabak": r"$g_\mathrm{Ca}$",
+#                     "g_SK": r"$g_\mathrm{SK}$",
+#                     "g_Na": r"$g_\mathrm{Na}$",
+#                     "g_l": r"$g_\mathrm{l}$",
+#                     "g_BK": r"$g_\mathrm{BK}$"
+#     }
+
+
+#     # Tabak
+#     xlabels = []
+#     for label in data_tabak.uncertain_parameters:
+#         xlabels.append(latex_labels[label])
+
+#     index = np.arange(1, len(data_tabak.uncertain_parameters)+1)*width
+
+
+#     sensitivity = data_tabak["burstiness_factor"].sobol_total_average
+#     mean = data_tabak["burstiness_factor"].mean
+#     std = np.sqrt(data_tabak["burstiness_factor"].variance)
+
+#     prettyBar(sensitivity,
+#               xlabels=xlabels,
+#               title="RAT",
+#               nr_colors=len(data_tabak.uncertain_parameters),
+#               index=index,
+#               ax=ax1,
+#               style=style)
+
+#     for tick in ax1.get_xticklabels():
+#         tick.set_rotation(-40)
+
+#     ax1.set_ylim([0, 1])
+#     # ax1.set_title(title, fontsize=titlesize)
+#     ax1.text(-0.08, 1.08, R"\textbf{A}", transform=ax1.transAxes, fontsize=titlesize)
+
+#     ax1.text(0.38, 0.9, "Mean = {mean:.2{c}}".format(mean=mean, c="e" if abs(mean) < 1e-2 else "f"),
+#             transform=ax1.transAxes, fontsize=labelsize)
+#     ax1.text(0.38, 0.8, "Std. = {std:.2{c}}".format(std=std, c="e" if abs(mean) < 1e-2 else "f"),
+#             transform=ax1.transAxes, fontsize=labelsize)
+
+#     ax1.tick_params(labelsize=fontsize)
+
+
+
+#     # Medaka
+#     xlabels = []
+#     for label in data_medaka.uncertain_parameters:
+#         xlabels.append(latex_labels[label])
+
+#     index = np.arange(1, len(data_medaka.uncertain_parameters)+1)*width
+
+
+#     sensitivity = data_medaka["burstiness_factor"].sobol_total_average
+#     mean = data_medaka["burstiness_factor"].mean
+#     std = np.sqrt(data_medaka["burstiness_factor"].variance)
+
+#     prettyBar(sensitivity,
+#               xlabels=xlabels,
+#               title="MEDAKA 1",
+#               nr_colors=len(data_medaka.uncertain_parameters),
+#               index=index,
+#               ax=ax2,
+#               style=style)
+
+#     for tick in ax2.get_xticklabels():
+#         tick.set_rotation(-40)
+
+#     ax2.set_ylim([0, 1.15])
+#     ax2.text(-0.08, 1.08, R"\textbf{B}", transform=ax2.transAxes, fontsize=titlesize)
+
+#     ax2.text(0.38, 0.9, "Mean = {mean:.2{c}}".format(mean=mean, c="e" if abs(mean) < 1e-2 else "f"),
+#             transform=ax2.transAxes, fontsize=labelsize)
+#     ax2.text(0.38, 0.8, "Std. = {std:.2{c}}".format(std=std, c="e" if abs(mean) < 1e-2 else "f"),
+#             transform=ax2.transAxes, fontsize=labelsize)
+
+#     ax2.tick_params(labelsize=fontsize)
+
+
+#     plt.tight_layout()
+#     plt.savefig("tabak_vs_medaka" + figure_format)
+
+#     plt.rcdefaults()
+
+
+
+
+
+
+
+
+def uq_tabak():
     parameters = {"g_K": 9.55e-4,
                   "g_Ca_tabak": 6.37e-4,
                   "g_SK": 6.37e-4,
                   "g_l": 6.37e-5,
-                  "g_BK": scale_conductance(0.67)}
+                  "g_BK": 2.4e-4}
 
     parameters = un.Parameters(parameters)
 
     # Set all parameters to have a uniform distribution
     parameters.set_all_distributions(un.uniform(1))
 
+    parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4)
+
+
     # Initialize the features
-    features = un.SpikingFeatures(new_features=[burstiness_factor, spikiness_factor],
+    features = un.SpikingFeatures(new_features=[burstiness_factor, bursting, spiking, APs],
                                   features_to_run=features_to_run,
                                   logger_level="error",
                                   strict=False,
@@ -517,9 +740,9 @@ def uncertain_tabak():
                            noise_amplitude=noise_amplitude,
                            simulation_time=simulation_time,
                            ignore=True,
+                           g_Ca_tabak=6.37e-4,
                            g_Na=0,
-                           g_Ca=0,
-                           stimulus_amplitude=0.00)
+                           g_Ca=0)
 
     # Perform the uncertainty quantification
     UQ = un.UncertaintyQuantification(model,
@@ -531,130 +754,131 @@ def uncertain_tabak():
                        plot="all",
                        figure_folder="tabak",
                        filename="tabak",
-                       polynomial_order=5)
+                       polynomial_order=polynomial_order)
 
-
-    plot_sobol(data, data, "sensitivity_tabak")
-
-
-
-
-
-def plot_feature(feature, datas, original_g_BKs):
-    uncertain_parameters = datas[0].uncertain_parameters
-
-    variance = {}
-    for uncertain_parameter in uncertain_parameters:
-        variance[uncertain_parameter] = []
-
-    for data in datas:
-        for i, uncertain_parameter in enumerate(uncertain_parameters):
-            responsible_variance = data[feature].variance*data[feature].sobol_first[i]
-
-            variance[uncertain_parameter].append(responsible_variance)
-
-
-
-    set_latex_font()
-    ax = create_figure(nr_colors=len(uncertain_parameters),
-                       palette="husl")
-
-    for uncertain_parameter in uncertain_parameters:
-        prettyPlot(original_g_BKs, variance[uncertain_parameter], marker=".", ax=ax, label=str_to_latex(uncertain_parameter))
-
-    ax.legend()
-    ax.set_xlabel(r"$\rightarrow g_{BK}$ (nS)")
-    ax.set_ylabel("Variance")
-    ax.tick_params(axis="both", which="major", labelsize=fontsize, labelcolor="black")
-    ax.set_title(feature.replace("_", " "))
-
-    plt.savefig("variance_" + feature + figure_format)
-
-    plt.rcdefaults()
+    return data
 
 
 
 
-def variance_medaka_2():
-    parameters = {"g_K": 9.55e-4*1.4,
-                  "g_Ca": 2e-4,
-                  "g_SK": 6.37e-4*3,
-                  "g_Na": 0.07,
-                  "g_l": 6.37e-5}
-
-    parameters = un.Parameters(parameters)
-
-    # Set all parameters to have a uniform distribution
-    parameters.set_all_distributions(un.uniform(1))
-
-    # Initialize the features
-    features = un.SpikingFeatures(new_features=[burstiness_factor, spikiness_factor],
-                                  features_to_run=features_to_run,
-                                  strict=False,
-                                  logger_level="error",
-                                  threshold=0.55,
-                                  end_threshold=-0.1,
-                                  normalize=True,
-                                  trim=False)
 
 
 
+# def plot_feature(feature, datas, original_g_BKs):
+#     uncertain_parameters = datas[0].uncertain_parameters
 
-    # Perform the uncertainty quantification
-    UQ = un.UncertaintyQuantification(model=None,
-                                      parameters=parameters,
-                                      features=features)
+#     variance = {}
+#     for uncertain_parameter in uncertain_parameters:
+#         variance[uncertain_parameter] = []
 
+#     for data in datas:
+#         for i, uncertain_parameter in enumerate(uncertain_parameters):
+#             responsible_variance = data[feature].variance*data[feature].sobol_first[i]
 
-    scale_g_BKs = np.arange(0, 1, 0.1) + 3
-
-    datas = []
-    for g_BK in scale_g_BKs:
-        # Initialize the model and defining default options
-        model = un.NeuronModel(file="medaka.py",
-                               name="medaka",
-                               discard=discard,
-                               noise_amplitude=noise_amplitude,
-                               simulation_time=simulation_time,
-                               ignore=True,
-                               taun=5,
-                               vf=-15,
-                               g_BK=scale_conductance(1)*g_BK,
-                               stimulus_amplitude=0.0015)
-
-
-        UQ.model = model
-        data =  UQ.quantify(seed=10, plot=None, save=False)
-
-        datas.append(data)
-
-    # for feature in datas[0]:
-    #     if datas[0].ndim(feature) == 0:
-    #         plot_feature(feature, datas, scale_g_BKs)
-
-    plot_feature("burstiness_factor", datas, scale_g_BKs)
-    plot_feature("average_duration", datas, scale_g_BKs)
+#             variance[uncertain_parameter].append(responsible_variance)
 
 
 
-def uncertain_medaka():
+#     set_latex_font()
+#     ax = create_figure(nr_colors=len(uncertain_parameters),
+#                        palette="husl")
+
+#     for uncertain_parameter in uncertain_parameters:
+#         prettyPlot(original_g_BKs, variance[uncertain_parameter], marker=".", ax=ax, label=str_to_latex(uncertain_parameter))
+
+#     ax.legend()
+#     ax.set_xlabel(r"$\rightarrow g_{BK}$ (nS)")
+#     ax.set_ylabel("Variance")
+#     ax.tick_params(axis="both", which="major", labelsize=fontsize, labelcolor="black")
+#     ax.set_title(feature.replace("_", " "))
+
+#     plt.savefig("variance_" + feature + figure_format)
+
+#     plt.rcdefaults()
+
+
+
+
+# def variance_medaka_2():
+#     parameters = {"g_K": 9.55e-4*1.4,
+#                   "g_Ca": 2e-4,
+#                   "g_SK": 6.37e-4*3,
+#                   "g_Na": 0.07,
+#                   "g_l": 6.37e-5}
+
+#     parameters = un.Parameters(parameters)
+
+#     # Set all parameters to have a uniform distribution
+#     parameters.set_all_distributions(un.uniform(1))
+
+#     # Initialize the features
+#     features = un.SpikingFeatures(new_features=[burstiness_factor, spikiness_factor],
+#                                   features_to_run=features_to_run,
+#                                   strict=False,
+#                                   logger_level="error",
+#                                   threshold=0.55,
+#                                   end_threshold=-0.1,
+#                                   normalize=True,
+#                                   trim=False)
+
+
+
+
+#     # Perform the uncertainty quantification
+#     UQ = un.UncertaintyQuantification(model=None,
+#                                       parameters=parameters,
+#                                       features=features)
+
+
+#     scale_g_BKs = np.arange(0, 1, 0.1) + 3
+
+#     datas = []
+#     for g_BK in scale_g_BKs:
+#         # Initialize the model and defining default options
+#         model = un.NeuronModel(file="medaka.py",
+#                                name="medaka",
+#                                discard=discard,
+#                                noise_amplitude=noise_amplitude,
+#                                simulation_time=simulation_time,
+#                                ignore=True,
+#                                taun=5,
+#                                vf=-15,
+#                                g_BK=scale_conductance(1)*g_BK,
+#                                stimulus_amplitude=0.0015)
+
+
+#         UQ.model = model
+#         data =  UQ.quantify(seed=10, plot=None, save=False)
+
+#         datas.append(data)
+
+#     # for feature in datas[0]:
+#     #     if datas[0].ndim(feature) == 0:
+#     #         plot_feature(feature, datas, scale_g_BKs)
+
+#     plot_feature("burstiness_factor", datas, scale_g_BKs)
+#     plot_feature("average_duration", datas, scale_g_BKs)
+
+
+
+def uq_medaka_1():
     parameters = {"g_K": 9.55e-4,
                   "g_Ca": 2e-4,
                   "g_SK": 6.37e-4,
                   "g_Na": 0.07,
                   "g_l": 6.37e-5,
-                  "g_BK": scale_conductance(0.67)}
+                  "g_BK": 2.4e-4}
 
     parameters = un.Parameters(parameters)
 
     # Set all parameters to have a uniform distribution
     parameters.set_all_distributions(un.uniform(1))
 
-    # parameters["g_Na"].distribution = cp.Uniform(0.07,
-    #                                              0.07+0.07/2)
+    parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4)
+
 
     # Initialize the features
-    features = un.SpikingFeatures(new_features=[burstiness_factor, spikiness_factor],
+    features = un.SpikingFeatures(new_features=[burstiness_factor, bursting, spiking, APs],
                                   features_to_run=features_to_run,
                                   logger_level="error",
                                   strict=False,
@@ -681,52 +905,30 @@ def uncertain_medaka():
                        plot="all",
                        figure_folder="medaka_1",
                        filename="medaka_1",
-                       polynomial_order=5)
+                       polynomial_order=polynomial_order)
 
-
-
-    # Initialize the model and defining default options
-    model = un.NeuronModel(file="medaka.py",
-                           name="medaka",
-                           discard=discard,
-                           noise_amplitude=noise_amplitude,
-                           simulation_time=simulation_time,
-                           ignore=True,
-                           stimulus_amplitude=0.0015)
-
-    # Perform the uncertainty quantification
-    UQ.model = model
-
-    # We set the seed to easier be able to reproduce the result
-    data_stim = UQ.quantify(seed=10,
-                            figure_folder="medaka_1_stim",
-                            filename="medaka_1_stim",
-                            plot="all",
-                            polynomial_order=5)
-
-    plot_sobol(data, data_stim, "sensitivity_medaka_1")
+    return data
 
 
 
 
 
 
-def uncertain_medaka_2():
+def uq_medaka_2():
     parameters = {"g_K": 9.55e-4*1.4,
                   "g_Ca": 2e-4,
                   "g_SK": 6.37e-4*3,
                   "g_Na": 0.07,
                   "g_l": 6.37e-5,
-                  "g_BK": scale_conductance(1)*4}
-
+                  "g_BK": 3.2e-4*4}
 
     parameters = un.Parameters(parameters)
 
     # Set all parameters to have a uniform distribution
-    parameters.set_all_distributions(un.uniform(0.02))
+    parameters.set_all_distributions(un.uniform(1))
 
     # Initialize the features
-    features = un.SpikingFeatures(new_features=[burstiness_factor, spikiness_factor],
+    features = un.SpikingFeatures(new_features=[burstiness_factor, bursting, spiking, APs],
                                   features_to_run=features_to_run,
                                   strict=False,
                                   logger_level="error",
@@ -749,43 +951,52 @@ def uncertain_medaka_2():
                                       features=features)
 
     # # We set the seed to easier be able to reproduce the result
-    # data = UQ.quantify(seed=10,
-    #                    figure_folder="medaka_2",
-    #                    filename="medaka_2",
-    #                    plot="all",
-    #                    polynomial_order=5)
+    data = UQ.quantify(seed=10,
+                       figure_folder="medaka_2",
+                       filename="medaka_2",
+                       plot="all",
+                       polynomial_order=polynomial_order)
 
-    # Initialize the model and defining default options
-    model = un.NeuronModel(file="medaka.py",
-                           name="medaka_2",
-                           discard=discard,
-                           noise_amplitude=noise_amplitude,
-                           simulation_time=simulation_time,
-                           ignore=True,
-                           stimulus_amplitude=stimulus_amplitude)
+    return data
 
-    # Perform the uncertainty quantification
-    UQ.model = model
 
-    # We set the seed to easier be able to reproduce the result
-    data_stim = UQ.quantify(seed=10,
-                            figure_folder="medaka_2_stim",
-                            filename="medaka_2_stim",
-                            plot="condensed_total",
-                            polynomial_order=5,
-                            single=False)
 
-    # plot_sobol(data, data_stim, "sensitivity_medaka_2")
-    # plot_sobol(data, data, "sensitivity_medaka_2")
-    plot_sobol(data_stim, data_stim, "test_2")
+
+
+
+def sobol_tabak():
+    data = uq_tabak()
+    plot_sobol(data, "sensitivity_tabak")
+
+def sobol_medaka_1():
+    data = uq_medaka_1()
+    plot_sobol(data, "sensitivity_medaka_1")
+
+def sobol_medaka_2():
+    data = uq_medaka_2()
+    plot_sobol(data, "sensitivity_medaka_2")
+
+
+def compare():
+    data_tabak = uq_tabak()
+    data_medaka_1 = uq_medaka_1()
+    data_medaka_2 = uq_medaka_2()
+
+    plot_compare_feature("bursting", "bursting", data_tabak, data_medaka_1, data_medaka_2)
+    plot_compare_feature("spiking", "spiking", data_tabak, data_medaka_1, data_medaka_2)
+    plot_compare_feature("APs", "APs", data_tabak, data_medaka_1, data_medaka_2)
+
 
 
 
 if __name__ == "__main__":
+    # Old
     # burstiness_robustness()
-    # uncertain_tabak()
-    # uncertain_medaka()
     # variance_medaka_2()
-
     # burstiness_tabak_vs_medaka()
-    uncertain_medaka_2()
+    # achieve_bursting_tabak_vs_medaka()
+
+    # sobol_tabak()
+    # sobol_medaka_1()
+    # sobol_medaka_2()
+    compare()
