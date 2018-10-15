@@ -2,6 +2,7 @@ article
 
 # Figures and data
 *.png
+*.eps
 *.h5
 
 # fish
