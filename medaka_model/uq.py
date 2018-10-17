@@ -24,13 +24,16 @@ figure_format = ".eps"
 discard = 1000                 # in ms
 simulation_time = 11000        # in ms
 noise_amplitude = 0            # in mV
-stimulus_amplitude = 0.000    # in nA
+stimulus_amplitude = 0   # in nA
 
 # Uncertainty quantification parameters
-polynomial_order = 3
-features_to_run = ["burstiness_factor", "spike_rate", "average_AP_overshoot",
-                   "average_AHP_depth", "average_duration", "spiking", "bursting",
-                   "APs"]
+polynomial_order = 1
+# features_to_run = ["burstiness_factor", "spike_rate", "average_AP_overshoot",
+#                    "average_AHP_depth", "average_duration", "spiking", "bursting",
+#                    "APs"]
+features_to_run = ["spiking", "bursting", "APs"]
+
+
 
 
 def str_to_latex(text):
@@ -39,6 +42,8 @@ def str_to_latex(text):
         return "$" + txt[0] + "_{\mathrm{" + "-".join(txt[1:]) + "}}$"
     else:
         return text
+
+
 def plot_sobol(data, filename):
 
     features =  ["spike_rate", "burstiness_factor", "average_duration",
@@ -153,26 +158,13 @@ def plot_sobol(data, filename):
 
 
 
-def plot_compare_feature(feature, filename, tabak, medaka_1, medaka_2):
 
-    # Plotting
+def plot_sobol_feature(data, feature, ax):
     style = "seaborn-darkgrid"
-    set_style(style)
-    set_latex_font()
-
-    plt.rcParams.update({"axes.titlepad": 8})
-    fig, axes = plt.subplots(nrows=2, ncols=2, squeeze=False, sharex="col", sharey="row",
-                             figsize=(figure_width, figure_width*0.8))
-
-    ax1 = axes[0][0]
-    ax2 = axes[0][1]
-    ax3 = axes[1][0]
-
-    axes[1][1].axis("off")
-
-    ax1.set_ylabel("Total-order Sobol indices", labelpad=30, fontsize=labelsize)
 
     width = 0.2
+    index = np.arange(1, len(data.uncertain_parameters)+1)*width
+
 
     latex_labels = {"g_K": r"$g_\mathrm{K}$",
                     "g_Ca": r"$g_\mathrm{Ca}$",
@@ -183,116 +175,256 @@ def plot_compare_feature(feature, filename, tabak, medaka_1, medaka_2):
                     "g_BK": r"$g_\mathrm{BK}$"
     }
 
-
-    # Tabak
     xlabels = []
-    for label in tabak.uncertain_parameters:
+    for label in data.uncertain_parameters:
         xlabels.append(latex_labels[label])
 
-    index = np.arange(1, len(tabak.uncertain_parameters)+1)*width
+        if feature.lower()  in ["medaka", "medaka_2"]:
+            title = "Membrane potential"
+        else:
+            title = feature.replace("_", " ")
+            title = title[0].upper() + title[1:]
+
+        sensitivity = data[feature].sobol_total_average
+        mean = data[feature].mean
+        std = np.sqrt(data[feature].variance)
+        unit = data[feature].labels
 
 
-    sensitivity = tabak[feature].sobol_total_average
-    mean = tabak[feature].mean
-    std = np.sqrt(tabak[feature].variance)
+        if len(unit) > 0 and "(" in unit[0]:
+            unit = unit[0].split("(")[-1].strip(")")
+        else:
+            unit = ""
 
-    prettyBar(sensitivity,
-              xlabels=xlabels,
-              title="RAT",
-              nr_colors=len(tabak.uncertain_parameters),
-              index=index,
-              ax=ax1,
-              style=style)
+        if feature == "spike_rate":
+            mean *= 1000
+            std *= 1000
+            unit = "Hz"
 
-    for tick in ax1.get_xticklabels():
-        tick.set_rotation(-40)
+        prettyBar(sensitivity,
+                  xlabels=xlabels,
+                  nr_colors=len(data.uncertain_parameters),
+                  index=index,
+                  ax=ax,
+                  # palette="husl",
+                  style=style)
 
-    ax1.set_ylim([0, 1])
-    # ax1.set_title(title, fontsize=titlesize)
-    ax1.text(-0.08, 1.08, r"\textbf{A}", transform=ax1.transAxes, fontsize=titlesize)
+        for tick in ax.get_xticklabels():
+            tick.set_rotation(-40)
 
-    ax1.text(0.38, 0.9, "Mean = {mean:.2{c}}".format(mean=mean, c="e" if abs(mean) < 1e-2 else "f"),
-            transform=ax1.transAxes, fontsize=labelsize)
-    ax1.text(0.38, 0.8, "Std. = {std:.2{c}}".format(std=std, c="e" if abs(mean) < 1e-2 else "f"),
-            transform=ax1.transAxes, fontsize=labelsize)
+        ax.set_ylim([0, 1.15])
+        ax.set_title(title, fontsize=titlesize)
+        ax.text(0.25, 0.9, "Mean = {mean:.2{c}} {unit}".format(mean=mean, c="e" if (abs(mean) < 1e-2 and mean != 0) else "f", unit=unit),
+                transform=ax.transAxes, fontsize=fontsize)
+        ax.text(0.25, 0.78, "Std. = {std:.2{c}} {unit}".format(std=std, c="e" if (abs(mean) < 1e-2 and mean != 0) else "f", unit=unit),
+                transform=ax.transAxes, fontsize=fontsize)
 
-    ax1.tick_params(labelsize=fontsize)
-
-
-
-    # Medaka 1
-    xlabels = []
-    for label in medaka_1.uncertain_parameters:
-        xlabels.append(latex_labels[label])
-
-    index = np.arange(1, len(medaka_1.uncertain_parameters)+1)*width
-
-
-    sensitivity = medaka_1[feature].sobol_total_average
-    mean = medaka_1[feature].mean
-    std = np.sqrt(medaka_1[feature].variance)
-
-    prettyBar(sensitivity,
-              xlabels=xlabels,
-              title="MEDAKA 1",
-              nr_colors=len(medaka_1.uncertain_parameters),
-              index=index,
-              ax=ax2,
-              style=style)
-
-    for tick in ax2.get_xticklabels():
-        tick.set_rotation(-40)
-
-    ax2.set_ylim([0, 1.15])
-    ax2.text(-0.08, 1.08, r"\textbf{B}", transform=ax2.transAxes, fontsize=titlesize)
-
-    ax2.text(0.38, 0.9, "Mean = {mean:.2{c}}".format(mean=mean, c="e" if abs(mean) < 1e-2 else "f"),
-            transform=ax2.transAxes, fontsize=labelsize)
-    ax2.text(0.38, 0.8, "Std. = {std:.2{c}}".format(std=std, c="e" if abs(mean) < 1e-2 else "f"),
-            transform=ax2.transAxes, fontsize=labelsize)
-
-    ax2.tick_params(labelsize=fontsize)
+        #ax.set_xticklabels(xlabels, fontsize=labelsize)
+        ax.tick_params(labelsize=fontsize)
 
 
 
-    # Medaka 2
-    xlabels = []
-    for label in medaka_2.uncertain_parameters:
-        xlabels.append(latex_labels[label])
 
-    index = np.arange(1, len(medaka_2.uncertain_parameters)+1)*width
+# def plot_compare_feature(feature, filename, tabak, medaka_1, medaka_2, axes):
 
+#     # Plotting
+#     style = "seaborn-darkgrid"
+#     set_style(style)
+#     set_latex_font()
 
-    sensitivity = medaka_2[feature].sobol_total_average
-    mean = medaka_2[feature].mean
-    std = np.sqrt(medaka_2[feature].variance)
+#     plt.rcParams.update({"axes.titlepad": 8})
+#     fig, axes = plt.subplots(nrows=2, ncols=2, squeeze=False, sharey="row",
+#                              figsize=(figure_width, figure_width*0.8))
 
-    prettyBar(sensitivity,
-              xlabels=xlabels,
-              title="MEDAKA 2",
-              nr_colors=len(medaka_2.uncertain_parameters),
-              index=index,
-              ax=ax3,
-              style=style)
-
-    for tick in ax3.get_xticklabels():
-        tick.set_rotation(-40)
-
-    ax3.set_ylim([0, 1.15])
-    ax3.text(-0.08, 1.08, r"\textbf{C}", transform=ax3.transAxes, fontsize=titlesize)
-
-    ax3.text(0.38, 0.9, "Mean = {mean:.2{c}}".format(mean=mean, c="e" if abs(mean) < 1e-2 else "f"),
-            transform=ax3.transAxes, fontsize=labelsize)
-    ax3.text(0.38, 0.8, "Std. = {std:.2{c}}".format(std=std, c="e" if abs(mean) < 1e-2 else "f"),
-            transform=ax3.transAxes, fontsize=labelsize)
-
-    ax3.tick_params(labelsize=fontsize)
+#     ax1 = axes[0]
+#     ax2 = axes[0]
+#     ax3 = axes[1]
 
 
+#     ax1.set_ylabel("Total-order Sobol indices", labelpad=30, fontsize=labelsize)
 
+#     width = 0.2
+
+#     latex_labels = {"g_K": r"$g_\mathrm{K}$",
+#                     "g_Ca": r"$g_\mathrm{Ca}$",
+#                     "g_Ca_tabak": r"$g_\mathrm{Ca}$",
+#                     "g_SK": r"$g_\mathrm{SK}$",
+#                     "g_Na": r"$g_\mathrm{Na}$",
+#                     "g_l": r"$g_\mathrm{l}$",
+#                     "g_BK": r"$g_\mathrm{BK}$"
+#     }
+
+
+#     # Tabak
+#     xlabels = []
+#     for label in tabak.uncertain_parameters:
+#         xlabels.append(latex_labels[label])
+
+#     index = np.arange(1, len(tabak.uncertain_parameters)+1)*width
+
+#     sensitivity = tabak[feature].sobol_total_average
+#     mean = tabak[feature].mean
+#     std = np.sqrt(tabak[feature].variance)
+
+#     prettyBar(sensitivity,
+#               xlabels=xlabels,
+#               title="RAT",
+#               nr_colors=len(tabak.uncertain_parameters),
+#               index=index,
+#               ax=ax1,
+#               style=style)
+
+#     for tick in ax1.get_xticklabels():
+#         tick.set_rotation(-40)
+
+#     ax1.set_ylim([0, 1])
+#     # ax1.set_title(title, fontsize=titlesize)
+#     ax1.text(-0.08, 1.08, r"\textbf{A}", transform=ax1.transAxes, fontsize=titlesize)
+
+#     ax1.text(0.38, 0.9, "Mean = {mean:.2{c}}".format(mean=mean, c="e" if abs(mean) < 1e-2 else "f"),
+#             transform=ax1.transAxes, fontsize=labelsize)
+#     ax1.text(0.38, 0.8, "Std. = {std:.2{c}}".format(std=std, c="e" if abs(mean) < 1e-2 else "f"),
+#             transform=ax1.transAxes, fontsize=labelsize)
+
+#     ax1.tick_params(labelsize=fontsize)
+
+
+
+#     # Medaka 1
+#     xlabels = []
+#     for label in medaka_1.uncertain_parameters:
+#         xlabels.append(latex_labels[label])
+
+#     index = np.arange(1, len(medaka_1.uncertain_parameters)+1)*width
+
+
+#     sensitivity = medaka_1[feature].sobol_total_average
+#     mean = medaka_1[feature].mean
+#     std = np.sqrt(medaka_1[feature].variance)
+
+#     prettyBar(sensitivity,
+#               xlabels=xlabels,
+#               title="MEDAKA 1",
+#               nr_colors=len(medaka_1.uncertain_parameters),
+#               index=index,
+#               ax=ax2,
+#               style=style)
+
+#     for tick in ax2.get_xticklabels():
+#         tick.set_rotation(-40)
+
+#     ax2.set_ylim([0, 1.15])
+#     ax2.text(-0.08, 1.08, r"\textbf{B}", transform=ax2.transAxes, fontsize=titlesize)
+
+#     ax2.text(0.38, 0.9, "Mean = {mean:.2{c}}".format(mean=mean, c="e" if abs(mean) < 1e-2 else "f"),
+#             transform=ax2.transAxes, fontsize=labelsize)
+#     ax2.text(0.38, 0.8, "Std. = {std:.2{c}}".format(std=std, c="e" if abs(mean) < 1e-2 else "f"),
+#             transform=ax2.transAxes, fontsize=labelsize)
+
+#     ax2.tick_params(labelsize=fontsize)
+
+
+
+#     # Medaka 2
+#     xlabels = []
+#     for label in medaka_2.uncertain_parameters:
+#         xlabels.append(latex_labels[label])
+
+#     index = np.arange(1, len(medaka_2.uncertain_parameters)+1)*width
+
+
+#     sensitivity = medaka_2[feature].sobol_total_average
+#     mean = medaka_2[feature].mean
+#     std = np.sqrt(medaka_2[feature].variance)
+
+#     prettyBar(sensitivity,
+#               xlabels=xlabels,
+#               title="MEDAKA 2",
+#               nr_colors=len(medaka_2.uncertain_parameters),
+#               index=index,
+#               ax=ax3,
+#               style=style)
+
+#     for tick in ax3.get_xticklabels():
+#         tick.set_rotation(-40)
+
+#     ax3.set_ylim([0, 1.15])
+#     ax3.text(-0.08, 1.08, r"\textbf{C}", transform=ax3.transAxes, fontsize=titlesize)
+
+#     ax3.text(0.38, 0.9, "Mean = {mean:.2{c}}".format(mean=mean, c="e" if abs(mean) < 1e-2 else "f"),
+#             transform=ax3.transAxes, fontsize=labelsize)
+#     ax3.text(0.38, 0.8, "Std. = {std:.2{c}}".format(std=std, c="e" if abs(mean) < 1e-2 else "f"),
+#             transform=ax3.transAxes, fontsize=labelsize)
+
+#     ax3.tick_params(labelsize=fontsize)
+
+
+
+
+#     plt.tight_layout()
+#     plt.savefig(filename + figure_format)
+
+#     plt.rcdefaults()
+
+
+
+
+
+
+
+
+
+
+def plot_compare(tabak, medaka_1, medaka_2):
+    style = "seaborn-darkgrid"
+    set_style(style)
+    set_latex_font()
+
+    plt.rcParams.update({"axes.titlepad": 12})
+    fig, axes = plt.subplots(nrows=3, ncols=3, squeeze=False, sharey="row",
+                             figsize=(figure_width, figure_width*0.8))
+
+
+
+    set_style("seaborn-white")
+    ax = fig.add_subplot(111, zorder=-10)
+    spines_color(ax, edges={"top": "None", "bottom": "None",
+                            "right": "None", "left": "None"})
+    ax.tick_params(top=False, bottom=False, left=False, right=False, labelsize=fontsize,
+                   labelbottom=False, labelleft=False)
+    ax.set_ylabel('Total-order Sobol indices', labelpad=65, fontsize=labelsize)
+
+
+
+    features = ["bursting", "spiking", "APs"]
+    datas = [tabak, medaka_1, medaka_2]
+
+    yticks = np.arange(0, 1.1, 0.25)
+
+    k = 0
+    for i in range(3):
+        for j in range(3):
+            ax = axes[i][j]
+
+            plot_sobol_feature(datas[i], features[j], ax)
+
+            ax.text(-0.08, 1.08, "\\textbf{{{}}}".format(string.ascii_uppercase[k]), transform=ax.transAxes, fontsize=titlesize)
+            ax.set_title("")
+            ax.set_yticks(yticks)
+
+            k += 1
+
+    axes[0][0].set_title("Bursting")
+    axes[0][1].set_title("Spiking")
+    axes[0][2].set_title("APs")
+
+    axes[0][0].set_ylabel("RAT", labelpad=12)
+    axes[1][0].set_ylabel("MEDAKA 1", labelpad=12)
+    axes[2][0].set_ylabel("MEDAKA 2", labelpad=12)
 
     plt.tight_layout()
-    plt.savefig(filename + figure_format)
+    plt.subplots_adjust(left=0.17)
+    plt.savefig("sensitivity" + figure_format)
 
     plt.rcdefaults()
 
@@ -312,7 +444,7 @@ def uq_tabak():
     # Set all parameters to have a uniform distribution
     parameters.set_all_distributions(un.uniform(1))
 
-    parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4)
+    # parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4)
 
 
     # Initialize the features
@@ -344,7 +476,7 @@ def uq_tabak():
 
     # We set the seed to easier be able to reproduce the result
     data = UQ.quantify(seed=10,
-                       plot="all",
+                       plot=None,
                        figure_folder="tabak",
                        filename="tabak",
                        polynomial_order=polynomial_order)
@@ -367,7 +499,7 @@ def uq_medaka_1():
     # Set all parameters to have a uniform distribution
     parameters.set_all_distributions(un.uniform(1))
 
-    parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4)
+    # parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4)
 
 
     # Initialize the features
@@ -395,7 +527,7 @@ def uq_medaka_1():
 
     # We set the seed to easier be able to reproduce the result
     data = UQ.quantify(seed=10,
-                       plot="all",
+                       plot=None,
                        figure_folder="medaka_1",
                        filename="medaka_1",
                        polynomial_order=polynomial_order)
@@ -447,13 +579,10 @@ def uq_medaka_2():
     data = UQ.quantify(seed=10,
                        figure_folder="medaka_2",
                        filename="medaka_2",
-                       plot="all",
+                       plot=None,
                        polynomial_order=polynomial_order)
 
     return data
-
-
-
 
 
 
@@ -475,9 +604,11 @@ def compare():
     data_medaka_1 = uq_medaka_1()
     data_medaka_2 = uq_medaka_2()
 
-    plot_compare_feature("bursting", "bursting", data_tabak, data_medaka_1, data_medaka_2)
-    plot_compare_feature("spiking", "spiking", data_tabak, data_medaka_1, data_medaka_2)
-    plot_compare_feature("APs", "APs", data_tabak, data_medaka_1, data_medaka_2)
+
+    plot_compare(data_tabak, data_medaka_1, data_medaka_2)
+    # plot_compare_feature("bursting", "bursting", data_tabak, data_medaka_1, data_medaka_2)
+    # plot_compare_feature("spiking", "spiking", data_tabak, data_medaka_1, data_medaka_2)
+    # plot_compare_feature("APs", "APs", data_tabak, data_medaka_1, data_medaka_2)
 
 
 
