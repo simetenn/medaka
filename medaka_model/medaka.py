@@ -378,7 +378,7 @@ def medaka_2(g_l=g_l,
     g_l : float, optional
         The leak conductance, in S/cm^2. Default is 6.37e-5 S/cm^2.
     e_pas : float, optional
-        Reversal potential for the leak current, in mV. Default is -50 mV.
+        Reversal potential for the leak current, in mV. Default is -45 mV.
     g_K : float, optional
         The maximal conductance of K channels, in S/cm^2. Default is
         1.337e-3 S/cm^2.
