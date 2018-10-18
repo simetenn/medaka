@@ -599,6 +599,191 @@ def uq_medaka_2():
 
 
 
+
+
+
+
+
+
+
+
+
+def uq_tabak_full():
+    parameters = {"g_K": 9.55e-4,
+                  "g_Ca_tabak": 6.37e-4,
+                  "g_SK": 6.37e-4,
+                  "g_l": 6.37e-5,
+                  "g_BK": 2.4e-4}
+
+    parameters = un.Parameters(parameters)
+
+    # Set all parameters to have a uniform distribution
+    parameters.set_all_distributions(un.uniform(1))
+
+    parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4)
+
+
+    # Initialize the features
+    features = un.SpikingFeatures(new_features=[burstiness_factor, bursting, spiking, APs],
+                                  features_to_run=features_to_run,
+                                  logger_level="error",
+                                  strict=False,
+                                  threshold=0.55,
+                                  end_threshold=-0.1,
+                                  normalize=True,
+                                  trim=False)
+
+
+    # Initialize the model and defining default options
+    model = un.NeuronModel(file="medaka.py",
+                           name="medaka",
+                           discard=discard,
+                           noise_amplitude=noise_amplitude,
+                           simulation_time=simulation_time,
+                           ignore=True,
+                           g_Ca_tabak=6.37e-4,
+                           g_Na=0,
+                           g_Ca=0)
+
+    # Perform the uncertainty quantification
+    UQ = un.UncertaintyQuantification(model,
+                                      parameters=parameters,
+                                      features=features)
+
+    # We set the seed to easier be able to reproduce the result
+    data = UQ.quantify(seed=10,
+                       plot=None,
+                       figure_folder="tabak",
+                       filename="tabak",
+                       polynomial_order=polynomial_order,
+                    #    method="mc",
+                    #    nr_mc_samples=1e5,
+                       save=False)
+
+    return data
+
+
+
+
+def uq_medaka_1_full():
+    parameters = {"g_K": 9.55e-4,
+                  "g_Ca": 2e-4,
+                  "g_SK": 6.37e-4,
+                  "g_Na": 0.07,
+                  "g_l": 6.37e-5,
+                  "g_BK": 2.4e-4}
+
+    parameters = un.Parameters(parameters)
+
+    # Set all parameters to have a uniform distribution
+    parameters.set_all_distributions(un.uniform(1))
+
+    parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4)
+
+
+    # Initialize the features
+    features = un.SpikingFeatures(new_features=[burstiness_factor, bursting, spiking, APs],
+                                  features_to_run=features_to_run,
+                                  logger_level="error",
+                                  strict=False,
+                                  threshold=0.55,
+                                  end_threshold=-0.1,
+                                  normalize=True,
+                                  trim=False)
+
+    # Initialize the model and defining default options
+    model = un.NeuronModel(file="medaka.py",
+                           name="medaka",
+                           discard=discard,
+                           noise_amplitude=noise_amplitude,
+                           simulation_time=simulation_time,
+                           ignore=True)
+
+    # Perform the uncertainty quantification
+    UQ = un.UncertaintyQuantification(model,
+                                      parameters=parameters,
+                                      features=features)
+
+    # We set the seed to easier be able to reproduce the result
+    data = UQ.quantify(seed=10,
+                       plot=None,
+                       figure_folder="medaka_1",
+                       filename="medaka_1",
+                       polynomial_order=polynomial_order,
+                    #    method="mc",
+                    #    nr_mc_samples=1e5,
+                       save=False)
+
+    return data
+
+
+
+
+
+
+def uq_medaka_2_full():
+    parameters = {"g_K": 9.55e-4*1.4,
+                  "g_Ca": 2e-4,
+                  "g_SK": 6.37e-4*3,
+                  "g_Na": 0.07,
+                  "g_l": 6.37e-5,
+                  "g_BK": 3.2e-4*4*0.67}
+
+    parameters = un.Parameters(parameters)
+
+    # Set all parameters to have a uniform distribution
+    parameters.set_all_distributions(un.uniform(1))
+
+    parameters["g_BK"].distribution = cp.Uniform(0, 4*3.2e-4)
+
+    # Initialize the features
+    features = un.SpikingFeatures(new_features=[burstiness_factor, bursting, spiking, APs],
+                                  features_to_run=features_to_run,
+                                  strict=False,
+                                  logger_level="error",
+                                  threshold=0.55,
+                                  end_threshold=-0.1,
+                                  normalize=True,
+                                  trim=False)
+
+    # Initialize the model and defining default options
+    model = un.NeuronModel(file="medaka.py",
+                           name="medaka_2",
+                           discard=discard,
+                           noise_amplitude=noise_amplitude,
+                           simulation_time=simulation_time,
+                           ignore=True)
+
+    # Perform the uncertainty quantification
+    UQ = un.UncertaintyQuantification(model,
+                                      parameters=parameters,
+                                      features=features)
+
+    # # We set the seed to easier be able to reproduce the result
+    data = UQ.quantify(seed=10,
+                       figure_folder="medaka_2",
+                       filename="medaka_2",
+                       plot=None,
+                       polynomial_order=polynomial_order,
+                    #    method="mc",
+                    #    nr_mc_samples=1e5,
+                       save=False)
+
+    return data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def sobol_tabak():
     data = uq_tabak()
     plot_sobol(data, "sensitivity_tabak")
@@ -625,6 +810,18 @@ def compare():
 
 
 
+
+def compare_full():
+    data_tabak = uq_tabak_full()
+    data_medaka_1 = uq_medaka_1_full()
+    data_medaka_2 = uq_medaka_2_full()
+
+
+    plot_compare(data_tabak, data_medaka_1, data_medaka_2)
+    plot_compare(data_tabak, data_medaka_1, data_medaka_2, sobol="first")
+
+
+
 def compare_memory():
     data_tabak = uq_tabak()
     data_tabak.evaluations = []
@@ -642,5 +839,6 @@ if __name__ == "__main__":
     # sobol_tabak()
     # sobol_medaka_1()
     # sobol_medaka_2()
-    compare()
+    # compare()
+    compare_full()
     # compare_memory()
