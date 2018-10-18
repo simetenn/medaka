@@ -137,6 +137,20 @@ def bursting(time, spikes, info):
             found_bursts = 1
             break
 
+    # if spikes.nr_spikes == 0:
+    #     return None, 0
+
+    # durations = []
+    # for spike in spikes:
+    #     durations.append(spike.time[-1] - spike.time[0])
+
+    # durations = np.array(durations)
+
+    # if np.all(durations > burst_threshold):
+    #     found_bursts = 1
+    # else:
+    #     found_bursts = 0
+
     return None, found_bursts
 
 
@@ -165,6 +179,20 @@ def spiking(time, spikes, info):
         if (spike.time[-1] - spike.time[0]) <= burst_threshold:
             found_spike = 1
             break
+
+    # if spikes.nr_spikes == 0:
+    #     return None, 0
+
+    # durations = []
+    # for spike in spikes:
+    #     durations.append(spike.time[-1] - spike.time[0])
+
+    # durations = np.array(durations)
+
+    # if np.all(durations <= burst_threshold):
+    #     found_spike = 1
+    # else:
+    #     found_spike = 0
 
     return None, found_spike
 
@@ -197,40 +225,40 @@ def APs(time, spikes, info):
 
 
 
-def bursts_spikes_aps(time, spikes, info):
-    """
-    Compatible with uncertainpy.SpikingFeatures.
+# def bursts_spikes_aps(time, spikes, info):
+#     """
+#     Compatible with uncertainpy.SpikingFeatures.
 
-    Parameters
-    ----------
-    time : {None, numpy.nan, array_like}
-        Time values of the model. If no time values it is None or numpy.nan.
-    spikes : uncertainpy.Spikes
-        Spikes found in the model result.
-    info : dictionary
-        Not used, but is required as input
+#     Parameters
+#     ----------
+#     time : {None, numpy.nan, array_like}
+#         Time values of the model. If no time values it is None or numpy.nan.
+#     spikes : uncertainpy.Spikes
+#         Spikes found in the model result.
+#     info : dictionary
+#         Not used, but is required as input
 
-    Returns
-    -------
-    time : None
-    burstiness_factor : float, None
-        The fraction of events that is above `burst_threshold`. Returns None
-        if there are no events.
-    """
-    voltage = spikes.V
-    time = spikes.time
+#     Returns
+#     -------
+#     time : None
+#     burstiness_factor : float, None
+#         The fraction of events that is above `burst_threshold`. Returns None
+#         if there are no events.
+#     """
+#     voltage = spikes.V
+#     time = spikes.time
 
-    durations = duration(time, voltage)
+#     durations = duration(time, voltage)
 
-    if not durations.size:
-        bursts = -1
-    elif np.any(durations > burst_threshold):
-        bursts = 1
-    else:
-        bursts = 0
+#     if not durations.size:
+#         bursts = -1
+#     elif np.any(durations > burst_threshold):
+#         bursts = 1
+#     else:
+#         bursts = 0
 
 
-    return None, bursts
+    # return None, bursts
 
 # def burstiness_efel(time, voltage, info):
 #     """
