@@ -131,11 +131,13 @@ def bursting(time, spikes, info):
         The fraction of events that is above `burst_threshold`. Returns None
         if there are no events.
     """
+    found_bursts = 0
     for spike in spikes:
         if (spike.time[-1] - spike.time[0]) > burst_threshold:
-            return None, 1
+            found_bursts = 1
+            break
 
-    return None, 0
+    return None, found_bursts
 
 
 def spiking(time, spikes, info):
@@ -158,11 +160,13 @@ def spiking(time, spikes, info):
         The fraction of events that is above `burst_threshold`. Returns None
         if there are no events.
     """
+    found_spike = 0
     for spike in spikes:
-        if (spike.time[-1] - spike.time[0]) < burst_threshold:
-            return None, 1
+        if (spike.time[-1] - spike.time[0]) <= burst_threshold:
+            found_spike = 1
+            break
 
-    return None, 0
+    return None, found_spike
 
 
 def APs(time, spikes, info):
@@ -185,11 +189,11 @@ def APs(time, spikes, info):
         The fraction of events that is above `burst_threshold`. Returns None
         if there are no events.
     """
-    APs = 0
+    found_APs = 0
     if spikes.nr_spikes > 0:
-        APs = 1
+        found_APs = 1
 
-    return None, APs
+    return None, found_APs
 
 
 
