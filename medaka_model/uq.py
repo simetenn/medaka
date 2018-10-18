@@ -27,7 +27,7 @@ noise_amplitude = 0            # in mV
 stimulus_amplitude = 0   # in nA
 
 # Uncertainty quantification parameters
-polynomial_order = 1
+polynomial_order = 5
 # features_to_run = ["burstiness_factor", "spike_rate", "average_AP_overshoot",
 #                    "average_AHP_depth", "average_duration", "spiking", "bursting",
 #                    "APs"]
@@ -159,7 +159,7 @@ def plot_sobol(data, filename):
 
 
 
-def plot_sobol_feature(data, feature, ax):
+def plot_sobol_feature(data, feature, ax, sobol="total"):
     style = "seaborn-darkgrid"
 
     width = 0.2
@@ -185,7 +185,11 @@ def plot_sobol_feature(data, feature, ax):
             title = feature.replace("_", " ")
             title = title[0].upper() + title[1:]
 
-        sensitivity = data[feature].sobol_total_average
+        if sobol == "total":
+            sensitivity = data[feature].sobol_total_average
+        else:
+            sensitivity = data[feature].sobol_first_average
+
         mean = data[feature].mean
         std = np.sqrt(data[feature].variance)
         unit = data[feature].labels
@@ -375,7 +379,7 @@ def plot_sobol_feature(data, feature, ax):
 
 
 
-def plot_compare(tabak, medaka_1, medaka_2):
+def plot_compare(tabak, medaka_1, medaka_2, sobol="total"):
     style = "seaborn-darkgrid"
     set_style(style)
     set_latex_font()
@@ -406,7 +410,7 @@ def plot_compare(tabak, medaka_1, medaka_2):
         for j in range(3):
             ax = axes[i][j]
 
-            plot_sobol_feature(datas[i], features[j], ax)
+            plot_sobol_feature(datas[i], features[j], ax, sobol=sobol)
 
             ax.text(-0.08, 1.08, "\\textbf{{{}}}".format(string.ascii_uppercase[k]), transform=ax.transAxes, fontsize=titlesize)
             ax.set_title("")
@@ -424,7 +428,7 @@ def plot_compare(tabak, medaka_1, medaka_2):
 
     plt.tight_layout()
     plt.subplots_adjust(left=0.17)
-    plt.savefig("sensitivity" + figure_format)
+    plt.savefig("sensitivity_" + sobol + figure_format)
 
     plt.rcdefaults()
 
@@ -479,7 +483,10 @@ def uq_tabak():
                        plot=None,
                        figure_folder="tabak",
                        filename="tabak",
-                       polynomial_order=polynomial_order)
+                       polynomial_order=polynomial_order,
+                    #    method="mc",
+                    #    nr_mc_samples=1e5,
+                       save=False)
 
     return data
 
@@ -530,7 +537,10 @@ def uq_medaka_1():
                        plot=None,
                        figure_folder="medaka_1",
                        filename="medaka_1",
-                       polynomial_order=polynomial_order)
+                       polynomial_order=polynomial_order,
+                    #    method="mc",
+                    #    nr_mc_samples=1e5,
+                       save=False)
 
     return data
 
@@ -545,7 +555,7 @@ def uq_medaka_2():
                   "g_SK": 6.37e-4*3,
                   "g_Na": 0.07,
                   "g_l": 6.37e-5,
-                  "g_BK": 3.2e-4*4}
+                  "g_BK": 3.2e-4*4*0.67}
 
     parameters = un.Parameters(parameters)
 
@@ -580,7 +590,10 @@ def uq_medaka_2():
                        figure_folder="medaka_2",
                        filename="medaka_2",
                        plot=None,
-                       polynomial_order=polynomial_order)
+                       polynomial_order=polynomial_order,
+                    #    method="mc",
+                    #    nr_mc_samples=1e5,
+                       save=False)
 
     return data
 
@@ -590,9 +603,11 @@ def sobol_tabak():
     data = uq_tabak()
     plot_sobol(data, "sensitivity_tabak")
 
+
 def sobol_medaka_1():
     data = uq_medaka_1()
     plot_sobol(data, "sensitivity_medaka_1")
+
 
 def sobol_medaka_2():
     data = uq_medaka_2()
@@ -606,15 +621,26 @@ def compare():
 
 
     plot_compare(data_tabak, data_medaka_1, data_medaka_2)
-    # plot_compare_feature("bursting", "bursting", data_tabak, data_medaka_1, data_medaka_2)
-    # plot_compare_feature("spiking", "spiking", data_tabak, data_medaka_1, data_medaka_2)
-    # plot_compare_feature("APs", "APs", data_tabak, data_medaka_1, data_medaka_2)
+    plot_compare(data_tabak, data_medaka_1, data_medaka_2, sobol="first")
 
 
 
+def compare_memory():
+    data_tabak = uq_tabak()
+    data_tabak.evaluations = []
+    data_medaka_1 = uq_medaka_1()
+    data_medaka_1.evaluations = []
+    data_medaka_2 = uq_medaka_2()
+    data_medaka_2.evaluations = []
+
+
+
+    plot_compare(data_tabak, data_medaka_1, data_medaka_2)
+    plot_compare(data_tabak, data_medaka_1, data_medaka_2, sobol="first")
 
 if __name__ == "__main__":
     # sobol_tabak()
     # sobol_medaka_1()
     # sobol_medaka_2()
     compare()
+    # compare_memory()
