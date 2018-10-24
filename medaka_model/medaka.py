@@ -9,19 +9,19 @@ nrn = neuron.h
 
 A = 3.1415927e-6 # cm^2
 
-def scale_conductance(g_x):
+def scale_conductance(G_x):
     """
     Rescale the conductances from from Tabak et. al. 2011 (nS) to the conductances
     required by neuron (S/cm^2).
 
     Parameters
     ----------
-    g_x : {float, int}
+    G_x : {float, int}
         Conductance from Tabak et. al. 2011 in nS.
 
     Returns
     -------
-    g_x_scaled : {float, int}
+    G_x_scaled : {float, int}
         Conductance rescaled to what neuron requires (S/cm^2). The cell has an area
         of 3.1415927e-6 cm^2.
 
@@ -30,15 +30,15 @@ def scale_conductance(g_x):
     -----
     Area of neuron cell:  3.1415927e-6 cm^2
 
-    g_x_scaled  (S/cm2) = g_{X, Tabak} (nS) * 1e-9 (S/nS) / A (cm^2) ~=  g_Tabak * 1.6 * 10^-4 (S/cm^2)
+    g_x_scaled  (S/cm2) = G_{x} (nS) * 1e-9 (S/nS) / A (cm^2) ~=  G_x * 1.6 * 10^-4 (S/cm^2)
     """
-    g_x_scaled = g_x*1e-9/A
+    g_x_scaled = G_x*1e-9/A
 
     return g_x_scaled
 
 
-c_scaled = 10*1e-6/A
-alpha_scaled = 0.0015*A*10**6
+c_NEURON = 10*1e-6/A
+alpha_NEURON = 0.0015*A*10**6
 
 
 g_l = 6.37e-5              # S/cm^2
@@ -107,7 +107,7 @@ def create_soma(g_l=g_l,
 
     for sec in nrn.allsec():
         sec.Ra = 100
-        sec.cm = c_scaled
+        sec.cm = c_NEURON
 
         sec.insert('pas')
         sec.insert("kdrt")                 # From Tabak 2011
@@ -126,7 +126,7 @@ def create_soma(g_l=g_l,
 
         for seg in sec:
             seg.ftau_bk = tau_BK
-            seg.alpha_Cadt = alpha_scaled
+            seg.alpha_Cadt = alpha_NEURON
             seg.g_pas = g_l
             seg.e_pas = e_pas
             seg.gkdrbar_kdrt = g_K # med kun kdrt & nax er 0.001 og 0.05 fine tall
