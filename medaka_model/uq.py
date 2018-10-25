@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import string
 
 from medaka import scale_conductance
-from burstiness import burstiness_factor, bursting, spiking, APs
+from burstiness import burstiness_factor, bursting, spiking, APs, min_spike_amplitude
 
 from uncertainpy.plotting.prettyplot.prettyplot import prettyBar, set_latex_font, set_style, spines_color, prettyPlot, create_figure
 
@@ -21,16 +21,14 @@ figure_format = ".eps"
 
 
 # Simulation parameters
-discard = 1000                 # in ms
-simulation_time = 11000        # in ms
+simulation_duration = 50000
+discard = 10000                 # in ms
+simulation_time = simulation_duration + discard
 noise_amplitude = 0            # in mV
-stimulus_amplitude = 0   # in nA
+stimulus_amplitude = 0         # in nA
 
 # Uncertainty quantification parameters
 polynomial_order = 5
-# features_to_run = ["burstiness_factor", "spike_rate", "average_AP_overshoot",
-#                    "average_AHP_depth", "average_duration", "spiking", "bursting",
-#                    "APs"]
 features_to_run = ["spiking", "bursting", "APs"]
 
 
@@ -194,6 +192,8 @@ def plot_sobol_feature(data, feature, ax, sobol="total"):
         std = np.sqrt(data[feature].variance)
         unit = data[feature].labels
 
+        if std < 1e-14:
+            sensitivity = [0]*len(data.uncertain_parameters)
 
         if len(unit) > 0 and "(" in unit[0]:
             unit = unit[0].split("(")[-1].strip(")")
@@ -405,22 +405,20 @@ def plot_compare(tabak, medaka_1, medaka_2, sobol="total"):
 
     yticks = np.arange(0, 1.1, 0.25)
 
-    k = 0
     for i in range(3):
         for j in range(3):
             ax = axes[i][j]
 
             plot_sobol_feature(datas[i], features[j], ax, sobol=sobol)
 
-            ax.text(-0.08, 1.08, "\\textbf{{{}}}".format(string.ascii_uppercase[k]), transform=ax.transAxes, fontsize=titlesize)
+            ax.text(-0.17, 1.08, "\\textbf{{{}}}".format(string.ascii_uppercase[i] + str(j + 1)), transform=ax.transAxes, fontsize=titlesize)
             ax.set_title("")
             ax.set_yticks(yticks)
 
-            k += 1
 
     axes[0][0].set_title("Bursting")
-    axes[0][1].set_title("Spiking")
-    axes[0][2].set_title("APs")
+    axes[0][1].set_title("Regular spiking")
+    axes[0][2].set_title("AP firing")
 
     axes[0][0].set_ylabel("RAT", labelpad=12)
     axes[1][0].set_ylabel("MEDAKA 1", labelpad=12)
@@ -459,7 +457,8 @@ def uq_tabak():
                                   threshold=0.55,
                                   end_threshold=-0.1,
                                   normalize=True,
-                                  trim=False)
+                                  trim=False,
+                                  min_amplitude=min_spike_amplitude)
 
 
     # Initialize the model and defining default options
@@ -517,7 +516,8 @@ def uq_medaka_1():
                                   threshold=0.55,
                                   end_threshold=-0.1,
                                   normalize=True,
-                                  trim=False)
+                                  trim=False,
+                                  min_amplitude=min_spike_amplitude)
 
     # Initialize the model and defining default options
     model = un.NeuronModel(file="medaka.py",
@@ -570,7 +570,8 @@ def uq_medaka_2():
                                   threshold=0.55,
                                   end_threshold=-0.1,
                                   normalize=True,
-                                  trim=False)
+                                  trim=False,
+                                  min_amplitude=min_spike_amplitude)
 
     # Initialize the model and defining default options
     model = un.NeuronModel(file="medaka.py",
@@ -631,7 +632,8 @@ def uq_tabak_full():
                                   threshold=0.55,
                                   end_threshold=-0.1,
                                   normalize=True,
-                                  trim=False)
+                                  trim=False,
+                                  min_amplitude=min_spike_amplitude)
 
 
     # Initialize the model and defining default options
@@ -689,7 +691,8 @@ def uq_medaka_1_full():
                                   threshold=0.55,
                                   end_threshold=-0.1,
                                   normalize=True,
-                                  trim=False)
+                                  trim=False,
+                                  min_amplitude=min_spike_amplitude)
 
     # Initialize the model and defining default options
     model = un.NeuronModel(file="medaka.py",
@@ -744,7 +747,8 @@ def uq_medaka_2_full():
                                   threshold=0.55,
                                   end_threshold=-0.1,
                                   normalize=True,
-                                  trim=False)
+                                  trim=False,
+                                  min_amplitude=min_spike_amplitude)
 
     # Initialize the model and defining default options
     model = un.NeuronModel(file="medaka.py",
@@ -799,6 +803,7 @@ def sobol_medaka_2():
     plot_sobol(data, "sensitivity_medaka_2")
 
 
+
 def compare():
     data_tabak = uq_tabak()
     data_medaka_1 = uq_medaka_1()
@@ -839,6 +844,6 @@ if __name__ == "__main__":
     # sobol_tabak()
     # sobol_medaka_1()
     # sobol_medaka_2()
-    # compare()
-    compare_full()
+    compare()
+    # compare_full()
     # compare_memory()

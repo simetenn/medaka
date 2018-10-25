@@ -7,6 +7,8 @@ import uncertainpy as un
 onset_threshold = 0.55          # fraction of the normalized voltage
 burst_threshold = 60            # in ms
 end_threshold = -0.1            # Relative to the onset_threshold
+min_spike_amplitude = 10        # mV
+
 
 def duration(time, voltage):
     """
@@ -34,7 +36,8 @@ def duration(time, voltage):
                                 threshold=onset_threshold,
                                 end_threshold=end_threshold,
                                 trim=False,
-                                normalize=True)
+                                normalize=True,
+                                min_amplitude=min_spike_amplitude)
 
     # Calculate the duration of each spike
     duration = []
