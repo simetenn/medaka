@@ -78,3 +78,14 @@ RUN echo "backend : Agg" >> .config/matplotlib/matplotlibrc
 RUN apt-get -y install texlive
 RUN apt-get -y install texlive-latex-extra
 RUN apt-get -y install dvipng
+
+
+# install specific versions of packages used
+RUN pip install --upgrade pip
+RUN pip install numpy==1.15.2
+RUN pip install scipy==1.1.0
+RUN pip install matplotlib==3.0.0
+# RUN pip install uncertainpy=1.1.0
+RUN pip install chaospy==2.3.5
+
+# ENTRYPOINT cd tabak/tabak_model; nrnivmodl; cd .. && bash
