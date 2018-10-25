@@ -1,7 +1,5 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import uncertainpy as un
-import chaospy as cp
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -14,12 +12,13 @@ from burstiness import burstiness, duration, burst_threshold
 
 data_folder = "../data"
 
-# Simulation and analysis parameters
+# Simulation parameters
+simulation_duration = 50000
 discard = 10000                 # in ms
-simulation_time = 50000        # in ms
+simulation_time = simulation_duration + discard
 noise_amplitude = 0.004        # in nA
 robustness_reruns = 512        # From original article
-simulation_time_plot = 15000    # in ms
+simulation_time_plot = 15000   # in ms
 
 
 # Plotting parameters
@@ -683,7 +682,17 @@ def comparison_noise():
     voltage_axes = [ax1, ax2, ax3]
     burst_axes = [ax4, ax5, ax6]
 
+    time_1_tabak -= discard
+    time_1_medaka -= discard
+    time_1 -= discard
 
+    time_05_tabak -= discard
+    time_05_medaka -= discard
+    time_05 -= discard
+
+    time_0_tabak -= discard
+    time_0_medaka -= discard
+    time_0 -= discard
 
     ax1.plot(time_1_tabak, V_1_tabak, color="tab:gray")
     ax1.plot(time_1_medaka, V_1_medaka, color="tab:blue")
@@ -715,7 +724,7 @@ def comparison_noise():
     for ax in voltage_axes:
         ax.set_ylabel("V (mV)")
         ax.set_ylim([-75, 40])
-        ax.set_xlim([discard, simulation_time_plot])
+        ax.set_xlim([0, simulation_time_plot - discard])
         ax.tick_params(axis="both", which="major", labelsize=fontsize, labelcolor="black")
 
 
@@ -1201,5 +1210,5 @@ def comparison_no_noise():
 if __name__ == "__main__":
     # figure_1()
     # figure_2()
-    # comparison_noise()
+    comparison_noise()
     comparison_no_noise()
