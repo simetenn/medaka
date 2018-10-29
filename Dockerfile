@@ -69,6 +69,6 @@ RUN pip install uncertainpy==1.1.4
 RUN pip install chaospy==2.3.5
 
 
-ENTRYPOINT cd tabak; nrnivmodl; bash
+ENTRYPOINT cd medaka; nrnivmodl; bash
 
 
