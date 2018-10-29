@@ -1,7 +1,8 @@
-# BK channels have opposite effects on sodium versus calcium mediated action potentials in endocrine pituitary cells.
+# NEURON model for endocrine pituitary cells in Medaka
 
 An implementation of the NEURON models created for the article:
-"BK channels have opposite effects on sodium versus calcium mediated action potentials in endocrine pituitary cells.".
+"BK channels have opposite effects on sodium versus calcium mediated action potentials in endocrine pituitary cells.",
+and all analysis of the model.
 
 
 ## Docker environment
@@ -45,7 +46,7 @@ run:
 python analysis.py
 ```
 
-<!-- This takes around 9 hours on a workstation computer. -->
+This takes around 7 minutes on a workstation computer.
 
 To perform the uncertainty quantification and sensitivity analysis of the model
 run:
@@ -54,7 +55,7 @@ run:
 python uq.py
 ```
 
-<!-- This takes around 8 minutes on a workstation computer. -->
+This takes around 4 minutes on a workstation computer.
 
 
 ## Content
