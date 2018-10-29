@@ -15,6 +15,7 @@ simulation_time = 60000        # ms
 noise_amplitude = 0.004        # nA
 simulation_time_plot = 15000   # ms
 
+figure_folder = "figures/"
 
 # Plotting parameters
 figure_width = 7.08
@@ -164,26 +165,6 @@ def comparison_noise():
                                                                                         g_Ca=0)
 
 
-   """
-    Create the figure that compares RAT, MEDAKA 1 and MEDAKA 2 with noise,
-    as well as the histogram of the frequency event durations.
-    Figure saved as comparison_noise.
-    """
-   """
-    Create the figure that compares RAT, MEDAKA 1 and MEDAKA 2 with noise,
-    as well as the histogram of the frequency event durations.
-    Figure saved as comparison_noise.
-    """
-   """
-    Create the figure that compares RAT, MEDAKA 1 and MEDAKA 2 with noise,
-    as well as the histogram of the frequency event durations.
-    Figure saved as comparison_noise.
-    """
-   """
-    Create the figure that compares RAT, MEDAKA 1 and MEDAKA 2 with noise,
-    as well as the histogram of the frequency event durations.
-    Figure saved as comparison_noise.
-    """
     # Medaka 2
     time_05, V_05 = medaka_2(noise_amplitude=noise_amplitude,
                              discard=discard,
@@ -438,7 +419,7 @@ def comparison_noise():
 
     plt.subplots_adjust(top=0.91)
 
-    plt.savefig("comparison_noise" + figure_format)
+    plt.savefig(figure_folder + "comparison_noise" + figure_format)
 
 
 
@@ -793,7 +774,7 @@ def comparison_no_noise():
 
     plt.subplots_adjust(top=0.91, wspace=1)
 
-    plt.savefig("comparison_no_noise" + figure_format)
+    plt.savefig(figure_folder + "comparison_no_noise" + figure_format)
 
 
 
