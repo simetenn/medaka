@@ -6,6 +6,8 @@ import numpy as np
 import neuron
 nrn = neuron.h
 
+# time step
+dt = 0.25 # ms
 
 A = 3.1415927e-6 # cm^2
 
@@ -192,7 +194,7 @@ def run_simulation(soma, simulation_time=5000, noise_amplitude=0):
     noise_amplitude : float, optional
         The amplitude of the noise added to the model, in nA. If 0, no noise is added.
         Note that the model uses adaptive timesteps if there is no noise,
-        and fixed timesteps with dt=0.25 if there is noise. Default is 0.
+        and fixed timesteps with dt=0.01 if there is noise. Default is 0.
 
     Returns
     -------
@@ -218,7 +220,7 @@ def run_simulation(soma, simulation_time=5000, noise_amplitude=0):
 
         noise_stim = insert_current_clamp(soma(0.5), duration=simulation_time)
 
-        nrn.dt = 0.25
+        nrn.dt = dt
         nrn.finitialize(-60)
         neuron.init()
 
@@ -318,7 +320,7 @@ def medaka(g_l=g_l,
     noise_amplitude : float, optional
         The amplitude of the noise added to the model, in nA. If 0, no noise is
         added. Note that the model uses adaptive timesteps if there is no noise,
-        and fixed timesteps with dt=0.25 if there is noise. Default is 0.
+        and fixed timesteps with dt=0.01 if there is noise. Default is 0.
     stimulus_amplitude : float, optional
         The amplitude of the stimulus added to the model, in nA. Default is 0.
 
@@ -409,7 +411,7 @@ def medaka_2(g_l=g_l,
     noise_amplitude : float, optional
         The amplitude of the noise added to the model, in nA. If 0, no noise is
         added. Note that the model uses adaptive timesteps if there is no noise,
-        and fixed timesteps with dt=0.25 if there is noise. Default is 0.
+        and fixed timesteps with dt=0.01 if there is noise. Default is 0.
     stimulus_amplitude : float, optional
         The amplitude of the stimulus added to the model, in nA. Default is 0.
 
