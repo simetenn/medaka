@@ -2,7 +2,7 @@
 
 An implementation of the NEURON models created for the article:
 "BK channels have opposite effects on sodium versus calcium mediated action potentials in endocrine pituitary cells.",
-and all analysis of the model.
+and all analysis of the models.
 
 
 ## Docker environment
