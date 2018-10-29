@@ -1,16 +1,10 @@
-# medaka
+# BK channels have opposite effects on sodium versus calcium mediated action potentials in endocrine pituitary cells.
 
-# Introduction
-
-A reference implementation of
-"*Fast-Activating Voltage- and Calcium-Dependent Potassium (BK) Conductance
-Promotes Bursting in Pituitary Cells: A Dynamic Clamp Study*,
-J. Tabak, M. Tomaiuolo, A. Gonzalez-Iglesias,  L. Milescu and R. Bertram,
-Journal of Neuroscience 31.46 (2011), 10.1523/JNEUROSCI.3235-11.2011"
+An implementation of the NEURON models created for the article:
+"BK channels have opposite effects on sodium versus calcium mediated action potentials in endocrine pituitary cells.".
 
 
-
-# Docker environment
+## Docker environment
 
 We have created a [Docker](https://www.docker.com/) environment
 with all dependencies installed.
@@ -19,7 +13,7 @@ This Docker environment can be started by running the bash script
 All results have been created in this Docker environment.
 
 
-# Dependencies
+## Dependencies
 
 The required dependencies are:
 
@@ -41,7 +35,7 @@ Additionaly the [Neuron](https://www.neuron.yale.edu/neuron/download) simulator
 with the Python interface is required. NEURON must be manually installed
 by the user.
 
-# Running the code
+## Running the code
 
 To create Figure 3 and Figure 4 in
 "BK channels have opposite effects on sodium versus calcium mediated action potentials in endocrine pituitary cells"
@@ -63,7 +57,7 @@ python uq.py
 <!-- This takes around 8 minutes on a workstation computer. -->
 
 
-# Content
+## Content
 
 The content of this folder is:
 
@@ -73,7 +67,7 @@ The content of this folder is:
 * `uq.py` - contains the uncertainty quantification and sensitivity analysis of the Medaka model.
 
 
-# Platform and package specifications
+## Platform and package specifications
 
 All results have been generated inside a Docker environment with:
 
@@ -87,5 +81,4 @@ matplotlib: 3.0.0
 Chaospy: 2.3.5
 Uncertainpy: 1.1.4
 NEURON: 7.6.2-3-g9f36b13
-tqdm: 4.28.1
 ```
