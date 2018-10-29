@@ -355,7 +355,7 @@ def uq_medaka_2():
                                       parameters=parameters,
                                       features=features)
 
-    # # We set the seed to easier be able to reproduce the result
+    # We set the seed to easier be able to reproduce the result
     data = UQ.quantify(seed=10,
                        figure_folder="medaka_2",
                        filename="medaka_2",
@@ -378,7 +378,6 @@ def compare():
         A data object that contains the results from the uncertainty
         quantification of the tabak model.
     """
-
     data_tabak = uq_tabak()
     data_medaka_1 = uq_medaka_1()
     data_medaka_2 = uq_medaka_2()
