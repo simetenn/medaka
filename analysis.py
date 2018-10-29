@@ -15,8 +15,6 @@ simulation_time = 60000        # ms
 noise_amplitude = 0.004        # nA
 simulation_time_plot = 15000   # ms
 
-figure_folder = "figures/"
-
 # Plotting parameters
 figure_width = 7.08
 titlesize = 12
@@ -26,6 +24,7 @@ figure_format = ".eps"
 label_x = -0.08
 label_y = 1.08
 axis_grey = (0.6, 0.6, 0.6)
+figure_folder = "figures/"
 
 
 # Set the random seed to increase reproducability
@@ -290,7 +289,6 @@ def comparison_noise():
     ax2.plot(time_05, V_05, color="tab:red")
     title = r"$0.5\cdot g_{\mathrm{BK}}$"
     ax2.set_title(title)
-    # ax2.get_xaxis().set_visible(False)
     ax2.text(label_x, label_y, r"\textbf{B}", transform=ax2.transAxes, fontsize=titlesize)
 
 
@@ -300,7 +298,6 @@ def comparison_noise():
     ax3.plot(time_0, V_0, color="tab:red")
     title = r"$0\cdot g_{\mathrm{BK}}$"
     ax3.set_title(title)
-    # ax3.get_xaxis().set_visible(False)
     ax3.text(label_x, label_y, r"\textbf{C}", transform=ax3.transAxes, fontsize=titlesize)
     ax3.set_xlabel("Time (ms)", fontsize=labelsize)
 
