@@ -22,11 +22,10 @@ figure_folder = "figures/"
 
 
 # Simulation parameters
-simulation_duration = 50000
-discard = 10000                 # in ms
-simulation_time = simulation_duration + discard
-noise_amplitude = 0            # in mV
-stimulus_amplitude = 0         # in nA
+discard = 10000                # ms
+simulation_time = 60000        # ms
+noise_amplitude = 0            # mV
+stimulus_amplitude = 0         # nA
 
 # Uncertainty quantification parameters
 polynomial_order = 5
