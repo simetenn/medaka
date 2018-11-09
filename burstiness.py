@@ -58,7 +58,7 @@ def burstiness(durations, burst_threshold=burst_threshold):
     durations : array
         A numpy array containing the duration of each spike in `voltage`.
     burst_threshold : float, optional
-        Default is 70 ms.
+        Default is 60 ms.
 
     Returns
     -------
