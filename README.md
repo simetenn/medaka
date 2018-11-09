@@ -22,6 +22,7 @@ The required dependencies are:
 * `matplotlib`
 * `uncertainpy`
 * `chaospy`
+* `NEURON`
 
 These can be installed with:
 
@@ -32,7 +33,7 @@ pip install uncertainpy
 pip install chaospy
 ```
 
-Additionaly the [Neuron](https://www.neuron.yale.edu/neuron/download) simulator
+Additionally, the [Neuron](https://www.neuron.yale.edu/neuron/download) simulator
 with the Python interface is required. NEURON must be manually installed
 by the user.
 
@@ -66,7 +67,7 @@ The content of this folder is:
 * `burstines.py` - contains the functions for calculating the burstiness.
 * `analysis.py` - contains the analysis of the Medaka model.
 * `uq.py` - contains the uncertainty quantification and sensitivity analysis of the Medaka model.
-
+* `*.mod` - NEURON files that implements the various ion channels.
 
 ## Platform and package specifications
 
@@ -74,9 +75,9 @@ All results have been generated inside a Docker environment with:
 
 ```
 Platform: linux
-Python: 3.7.0 (default, Jun 28 2018, 13:15:42) 
+Python: 3.7.0 (default, Jun 28 2018, 13:15:42)
 [GCC 7.2.0]
-Machine and architecture x86_64 64bit 
+Machine and architecture x86_64 64bit
 NumPy: 1.15.2
 matplotlib: 3.0.0
 Chaospy: 2.3.5
