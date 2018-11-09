@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 from matplotlib.patches import Patch
 
@@ -24,7 +25,9 @@ figure_format = ".eps"
 label_x = -0.08
 label_y = 1.08
 axis_grey = (0.6, 0.6, 0.6)
-figure_folder = "figures/"
+
+figure_folder = "figures"
+output_file = "spikes.txt"
 
 
 # Set the random seed to increase reproducability
@@ -244,7 +247,6 @@ def comparison_noise():
                                                                     g_Ca=0)
 
 
-
     # Plotting
     plt.rcParams.update(params)
 
@@ -416,7 +418,7 @@ def comparison_noise():
 
     plt.subplots_adjust(top=0.91)
 
-    plt.savefig(figure_folder + "comparison_noise" + figure_format)
+    plt.savefig(os.path.join(figure_folder, "comparison_noise" + figure_format))
 
 
 
@@ -645,98 +647,96 @@ def comparison_no_noise():
     label_x_shift = -0.1
 
     # Selections
-    # 1*g_bk
-    index = get_index(time_1_tabak, 2500)
-    tmp_time = time_1_tabak[index] - time_1_tabak[index].min()
-    ax6.plot(tmp_time, V_1_tabak[index], color="tab:gray")
-    print("1*g_bk RAT:", V_1_tabak[index].max())
+    with open(output_file, "w") as output:
+        # 1*g_bk
+        index = get_index(time_1_tabak, 2500)
+        tmp_time = time_1_tabak[index] - time_1_tabak[index].min()
+        ax6.plot(tmp_time, V_1_tabak[index], color="tab:gray")
+        output.write("1*g_bk RAT: " +  str(V_1_tabak[index].max()) + "\n")
 
-    index = get_index(time_1_medaka, 2400)
-    tmp_time = time_1_medaka[index] - time_1_medaka[index].min()
-    ax6.plot(tmp_time, V_1_medaka[index], color="tab:blue")
-    print("1*g_bk MEDAKA 1:", V_1_medaka[index].max())
+        index = get_index(time_1_medaka, 2400)
+        tmp_time = time_1_medaka[index] - time_1_medaka[index].min()
+        ax6.plot(tmp_time, V_1_medaka[index], color="tab:blue")
+        output.write("1*g_bk MEDAKA 1: " + str(V_1_medaka[index].max()) + "\n")
 
-    index = get_index(time_1, 2320)
-    tmp_time = time_1[index] - time_1[index].min()
-    ax6.plot(tmp_time, V_1[index], color="tab:red")
-    ax6.text(label_x + label_x_shift, label_y, r"\textbf{A2}", transform=ax6.transAxes, fontsize=titlesize)
-    ax6.set_title("Action potential shape")
-    print("1*g_bk MEDAKA 2:", V_1[index].max())
-    print()
-
-
-    # 0.5*g_bk
-    index = get_index(time_05_tabak, 2450)
-    tmp_time = time_05_tabak[index] - time_05_tabak[index].min()
-    ax7.plot(tmp_time, V_05_tabak[index], color="tab:gray")
-    print("0.5*g_bk RAT:", V_05_tabak[index].max())
-
-    index = get_index(time_05_medaka, 2570)
-    tmp_time = time_05_medaka[index] - time_05_medaka[index].min()
-    ax7.plot(tmp_time, V_05_medaka[index], color="tab:blue")
-    print("0.5*g_bk MEDAKA 1:", V_05_medaka[index].max())
-
-    index = get_index(time_05, 2000)
-    tmp_time = time_05[index] - time_05[index].min()
-    ax7.plot(tmp_time, V_05[index], color="tab:red")
-    ax7.text(label_x + label_x_shift, label_y, r"\textbf{B2}", transform=ax7.transAxes, fontsize=titlesize)
-    print("0.5*g_bk MEDAKA 2:", V_05[index].max())
-    print()
+        index = get_index(time_1, 2320)
+        tmp_time = time_1[index] - time_1[index].min()
+        ax6.plot(tmp_time, V_1[index], color="tab:red")
+        ax6.text(label_x + label_x_shift, label_y, r"\textbf{A2}", transform=ax6.transAxes, fontsize=titlesize)
+        ax6.set_title("Action potential shape")
+        output.write("1*g_bk MEDAKA 2: " + str(V_1[index].max()) + "\n\n")
 
 
-    # 0.2*g_bk
-    index = get_index(time_02_tabak, 900)
-    tmp_time = time_02_tabak[index] - time_02_tabak[index].min()
-    ax8.plot(tmp_time, V_02_tabak[index], color="tab:gray")
-    print("0.2*g_bk RAT:", V_02_tabak[index].max())
+        # 0.5*g_bk
+        index = get_index(time_05_tabak, 2450)
+        tmp_time = time_05_tabak[index] - time_05_tabak[index].min()
+        ax7.plot(tmp_time, V_05_tabak[index], color="tab:gray")
+        output.write("0.5*g_bk RAT: " + str(V_05_tabak[index].max()) + "\n")
 
-    index = get_index(time_02_medaka, 1050)
-    tmp_time = time_02_medaka[index] - time_02_medaka[index].min()
-    ax8.plot(tmp_time, V_02_medaka[index], color="tab:blue")
-    print("0.2*g_bk MEDAKA 1:", V_02_medaka[index].max())
+        index = get_index(time_05_medaka, 2570)
+        tmp_time = time_05_medaka[index] - time_05_medaka[index].min()
+        ax7.plot(tmp_time, V_05_medaka[index], color="tab:blue")
+        output.write("0.5*g_bk MEDAKA 1: " + str(V_05_medaka[index].max()) + "\n")
 
-    index = get_index(time_02, 1280)
-    tmp_time = time_02[index] - time_02[index].min()
-    ax8.plot(tmp_time, V_02[index], color="tab:red")
-    ax8.text(label_x + label_x_shift, label_y, r"\textbf{C2}", transform=ax8.transAxes, fontsize=titlesize)
-    print("0.2*g_bk MEDAKA 2:", V_02[index].max())
-    print()
-
-
-    # 0.16*g_bk
-    index = get_index(time_016_tabak, 3050)
-    tmp_time = time_016_tabak[index] - time_016_tabak[index].min()
-    ax9.plot(tmp_time, V_016_tabak[index], color="tab:gray")
-    print("0.16*g_bk RAT:", V_016_tabak[index].max())
-
-    index = get_index(time_016_medaka, 3350)
-    tmp_time = time_016_medaka[index] - time_016_medaka[index].min()
-    ax9.plot(tmp_time, V_016_medaka[index], color="tab:blue")
-    print("0.16*g_bk MEDAKA 1:", V_016_medaka[index].max())
-
-    index = get_index(time_016, 3100)
-    tmp_time = time_016[index] - time_016[index].min()
-    ax9.plot(tmp_time, V_016[index], color="tab:red")
-    ax9.text(label_x + label_x_shift, label_y, r"\textbf{D2}", transform=ax9.transAxes, fontsize=titlesize)
-    print("0.16*g_bk MEDAKA 2:", V_016[index].max())
-    print()
+        index = get_index(time_05, 2000)
+        tmp_time = time_05[index] - time_05[index].min()
+        ax7.plot(tmp_time, V_05[index], color="tab:red")
+        ax7.text(label_x + label_x_shift, label_y, r"\textbf{B2}", transform=ax7.transAxes, fontsize=titlesize)
+        output.write("0.5*g_bk MEDAKA 2: " + str(V_05[index].max()) + "\n\n")
 
 
-    # 0*g_bk
-    index = get_index(time_0_tabak, 2000)
-    tmp_time = time_0_tabak[index] - time_0_tabak[index].min()
-    ax10.plot(tmp_time, V_0_tabak[index], color="tab:gray")
-    print("0*g_bk RAT:", V_0_tabak[index].max())
+        # 0.2*g_bk
+        index = get_index(time_02_tabak, 900)
+        tmp_time = time_02_tabak[index] - time_02_tabak[index].min()
+        ax8.plot(tmp_time, V_02_tabak[index], color="tab:gray")
+        output.write("0.2*g_bk RAT: " + str(V_02_tabak[index].max()) + "\n")
 
-    index = get_index(time_0_medaka, 2200)
-    tmp_time = time_0_medaka[index] - time_0_medaka[index].min()
-    ax10.plot(tmp_time, V_0_medaka[index], color="tab:blue")
-    print("0*g_bk MEDAKA 1:", V_0_medaka[index].max())
+        index = get_index(time_02_medaka, 1050)
+        tmp_time = time_02_medaka[index] - time_02_medaka[index].min()
+        ax8.plot(tmp_time, V_02_medaka[index], color="tab:blue")
+        output.write("0.2*g_bk MEDAKA 1: " + str(V_02_medaka[index].max()) + "\n")
 
-    index = get_index(time_0, 3850)
-    tmp_time = time_0[index] - time_0[index].min()
-    ax10.plot(tmp_time, V_0[index], color="tab:red")
-    print("0*g_bk MEDAKA 2:", V_0[index].max())
+        index = get_index(time_02, 1280)
+        tmp_time = time_02[index] - time_02[index].min()
+        ax8.plot(tmp_time, V_02[index], color="tab:red")
+        ax8.text(label_x + label_x_shift, label_y, r"\textbf{C2}", transform=ax8.transAxes, fontsize=titlesize)
+        output.write("0.2*g_bk MEDAKA 2: " + str(V_02[index].max()) + "\n\n")
+
+
+        # 0.16*g_bk
+        index = get_index(time_016_tabak, 3050)
+        tmp_time = time_016_tabak[index] - time_016_tabak[index].min()
+        ax9.plot(tmp_time, V_016_tabak[index], color="tab:gray")
+        output.write("0.16*g_bk RAT: " + str(V_016_tabak[index].max() + "\n"))
+
+        index = get_index(time_016_medaka, 3350)
+        tmp_time = time_016_medaka[index] - time_016_medaka[index].min()
+        ax9.plot(tmp_time, V_016_medaka[index], color="tab:blue")
+        output.write("0.16*g_bk MEDAKA 1: " + str(V_016_medaka[index].max()) + "\n")
+
+        index = get_index(time_016, 3100)
+        tmp_time = time_016[index] - time_016[index].min()
+        ax9.plot(tmp_time, V_016[index], color="tab:red")
+        ax9.text(label_x + label_x_shift, label_y, r"\textbf{D2}", transform=ax9.transAxes, fontsize=titlesize)
+        output.write("0.16*g_bk MEDAKA 2: " + str(V_016[index].max()) + "\n\n")
+
+
+        # 0*g_bk
+        index = get_index(time_0_tabak, 2000)
+        tmp_time = time_0_tabak[index] - time_0_tabak[index].min()
+        ax10.plot(tmp_time, V_0_tabak[index], color="tab:gray")
+        output.write("0*g_bk RAT: " + str(V_0_tabak[index].max()) + "\n")
+
+        index = get_index(time_0_medaka, 2200)
+        tmp_time = time_0_medaka[index] - time_0_medaka[index].min()
+        ax10.plot(tmp_time, V_0_medaka[index], color="tab:blue")
+        output.write("0*g_bk MEDAKA 1: " + str(V_0_medaka[index].max()) + "\n")
+
+        index = get_index(time_0, 3850)
+        tmp_time = time_0[index] - time_0[index].min()
+        ax10.plot(tmp_time, V_0[index], color="tab:red")
+        output.write("0*g_bk MEDAKA 2:" + str(V_0[index].max()) + "\n")
+
 
     ax10.set_xlabel("Relative time (ms)", fontsize=labelsize)
     ax10.text(label_x + label_x_shift, label_y, r"\textbf{E2}", transform=ax10.transAxes, fontsize=titlesize)
@@ -771,7 +771,7 @@ def comparison_no_noise():
 
     plt.subplots_adjust(top=0.91, wspace=1)
 
-    plt.savefig(figure_folder + "comparison_no_noise" + figure_format)
+    plt.savefig(os.path.join(figure_folder, "comparison_no_noise" + figure_format))
 
 
 
