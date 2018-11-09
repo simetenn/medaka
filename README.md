@@ -74,10 +74,10 @@ All results have been generated inside a Docker environment with:
 
 ```
 Platform: linux
-Python: 3.7.0 (default, Jun 28 2018, 13:15:42)
+Python: 3.7.0 (default, Jun 28 2018, 13:15:42) 
 [GCC 7.2.0]
-Machine and architecture x86_64 64bit
-NumPy: 1.15.1
+Machine and architecture x86_64 64bit 
+NumPy: 1.15.2
 matplotlib: 3.0.0
 Chaospy: 2.3.5
 Uncertainpy: 1.1.4
