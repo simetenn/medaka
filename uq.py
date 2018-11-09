@@ -203,6 +203,8 @@ def uq_tabak():
     # within a +/- 50% interval around their original value
     parameters.set_all_distributions(un.uniform(1))
 
+    parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4)
+
     # Initialize the features
     features = un.SpikingFeatures(new_features=[bursting, spiking, APs],
                                   features_to_run=features_to_run,
@@ -266,6 +268,7 @@ def uq_medaka_1():
     # within a +/- 50% interval around their original value
     parameters.set_all_distributions(un.uniform(1))
 
+    parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4)
 
     # Initialize the features
     features = un.SpikingFeatures(new_features=[bursting, spiking, APs],
@@ -329,6 +332,8 @@ def uq_medaka_2():
     # Set all parameters to have a uniform distribution
     # within a +/- 50% interval around their original value
     parameters.set_all_distributions(un.uniform(1))
+
+    parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4*4)
 
     # Initialize the features
     features = un.SpikingFeatures(new_features=[bursting, spiking, APs],
