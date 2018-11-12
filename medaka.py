@@ -11,31 +11,30 @@ dt = 0.25 # ms
 
 A = 3.1415927e-6 # cm^2
 
-
 c_NEURON = 10*1e-6/A
 alpha_NEURON = 0.0015*A*10**6
 
 
 g_l = 6.37e-5              # S/cm^2
-g_Ca_rat = 0             # S/cm^2
-g_SK = 6.34e-4             # S/cm^2
+g_Ca_rat = 0               # S/cm^2
+g_SK = 6.37e-4             # S/cm^2
 g_Na = 0.07                # S/cm^2
 g_Ca = 2e-4                # S/cm^2
-g_K = 9.6e-4              # S/cm^2
-taun = 30
-vf = -20
+g_K = 9.55e-4              # S/cm^2
+tau_n = 30
+v_f = -20
 
 def create_soma(g_l=g_l,
-                e_pas=-45,
                 g_K=g_K,
-                g_Ca_rat=g_Ca_rat,
                 g_SK=g_SK,
                 g_BK=0,
-                tau_BK=5,
                 g_Na=g_Na,
                 g_Ca=g_Ca,
-                taun=taun,
-                vf=vf):
+                g_Ca_rat=g_Ca_rat,
+                E_leak=-45,
+                tau_BK=5,
+                tau_n=tau_n,
+                v_f=v_f):
     """
     Create the soma of a neuron.
 
@@ -43,29 +42,29 @@ def create_soma(g_l=g_l,
     ----------
     g_l : float, optional
         The leak conductance, in S/cm^2. Default is 6.37e-5 S/cm^2.
-    e_pas : float, optional
-        Reversal potential for the leak current, in mV. Default is -45 mV.
     g_K : float, optional
         The maximal conductance of K channels, in S/cm^2. Default is
         9.55e-4 S/cm^2.
-    g_Ca_rat : float, optional
-        The maximal conductance of Ca channels (tabak version), in S/cm^2. Default is
-        6.37e-4 S/cm^2.
     g_SK : float, optional
         The maximal conductance of SK channels, in S/cm^2. Default is
         6.37e-4 S/cm^2.
     g_BK : float, optional
         The maximal conductance of BK channels, in S/cm^2. Default is 0 S/cm^2.
-    tau_BK : float, optional
-        Time constant of the BK channel, in ms. Default is 5 ms.
     g_Na: float, optional
         The maximal conductance of Na channels, in S/cm^2. Default is 0.07 S/cm^2.
     g_Ca : float, optional
         The maximal conductance of Ca channels (medaka version), in S/cm^2.
         Default is 2e-4 S/cm^2.
-    taun : float, optional
+    g_Ca_rat : float, optional
+        The maximal conductance of Ca channels (tabak version), in S/cm^2. Default is
+        0 S/cm^2.
+    E_leak : float, optional
+        Reversal potential for the leak current, in mV. Default is -45 mV.
+    tau_BK : float, optional
+        Time constant of the BK channel, in ms. Default is 5 ms.
+    tau_n : float, optional
         Time constant of n (activation of I_K), in ms. Default is 30 ms.
-    vf : float, optional
+    v_f : float, optional
         Voltage value at the midpoint of f (activation of I_BK), in mV. Default
         is -20 mV.
 
@@ -103,13 +102,13 @@ def create_soma(g_l=g_l,
             seg.ftau_bk = tau_BK
             seg.alpha_Cadt = alpha_NEURON
             seg.g_pas = g_l
-            seg.e_pas = e_pas
+            seg.e_pas = E_leak
             seg.gkdrbar_kdrt = g_K # med kun kdrt & nax er 0.001 og 0.05 fine tall
             seg.ghvat_ihvat = g_Ca_rat
             seg.gskbar_sk = g_SK
             seg.gbk_bk = g_BK
-            seg.taun_kdrt = taun
-            seg.vf_bk = vf
+            seg.taun_kdrt = tau_n
+            seg.vf_bk = v_f
 
             # TODO Check these
             seg.gbar_naxm = g_Na
@@ -129,11 +128,7 @@ def insert_current_clamp(input_site, duration=5000, delay=0, amplitude=0):
         0 would mean start, and 1 would mean at the end of the segment in question.
     duration : {float, int}, optional
         Duration of stimulus in ms. Default is 5000 ms.
-    delay:    taun : float, optional
-        Time constant of n (activation of I_K), in ms. Default is 30 ms.
-    vf : float, optional
-        Voltage value at the midpoint of f (activation of I_BK), in mV. Default
-        is -20 mV.
+    delay: float, optional
         Delay of stimulus in ms. Default is 0 ms.
     amplitude:
         Amplitude of stimulus in nA. Default is 0 nA.
@@ -167,7 +162,7 @@ def run_simulation(soma, simulation_time=5000, noise_amplitude=0):
     noise_amplitude : float, optional
         The amplitude of the noise added to the model, in nA. If 0, no noise is added.
         Note that the model uses adaptive timesteps if there is no noise,
-        and fixed timesteps with dt=0.01 if there is noise. Default is 0.
+        and fixed timesteps with dt = 0.25 if there is noise. Default is 0.
 
     Returns
     -------
@@ -236,142 +231,52 @@ def record(record_site):
     return rec_t, rec_v
 
 
-def rat(g_l=g_l,
-        e_pas=-45,
-        g_K=g_K,
-        g_Ca_rat=6.34e-4,
-        g_SK=g_SK,
-        g_BK=3.2e-4,
-        tau_BK=5,
-        g_Na=0,
-        g_Ca=0,
-        taun=taun,
-        vf=vf,
-        simulation_time=5000,
-        noise_amplitude=0,
-        stimulus_amplitude=0,
-        discard=0):
+def run_general_model(g_l=g_l,
+                      g_K=g_K,
+                      g_SK=g_SK,
+                      g_BK=0,
+                      g_Na=g_Na,
+                      g_Ca=g_Ca,
+                      g_Ca_rat=g_Ca_rat,
+                      E_leak=-45,
+                      tau_BK=5,
+                      tau_n=tau_n,
+                      v_f=v_f,
+                      simulation_time=5000,
+                      noise_amplitude=0,
+                      stimulus_amplitude=0,
+                      discard=0):
     """
-    Medaka 1 neuron model of medaka cells in fish. Minimal changes from the
-    Tabak et. al. 2011 model for medaka cells in rat.
-
-    http://www.jneurosci.org/content/31/46/16855/tab-article-info
+    Run the model of pituitary cells. Default set of parameters is the same
+    as for medaka_1.
 
     Parameters
     ----------
     g_l : float, optional
         The leak conductance, in S/cm^2. Default is 6.37e-5 S/cm^2.
-    e_pas : float, optional
-        Reversal potential for the leak current, in mV. Default is -50 mV.
     g_K : float, optional
         The maximal conductance of K channels, in S/cm^2. Default is
         9.55e-4 S/cm^2.
-    g_Ca_rat : float, optional
-        The maximal conductance of Ca channels (tabak version), in S/cm^2. Default is
-        6.37e-4 S/cm^2.
     g_SK : float, optional
         The maximal conductance of SK channels, in S/cm^2. Default is
         6.37e-4 S/cm^2.
     g_BK : float, optional
-        The maximal conductance of BK channels, in S/cm^2. Default is 3.2e-4 S/cm^2.
-    tau_BK : float, optional
-        Time constant of the BK channel, in ms. Default is 5 ms.
-    g_Na: float, optional
-        The maximal conductance of Na channels, in S/cm^2. Default is 0 S/cm^2.
-    g_Ca : float, optional
-        The maximal conductance of Ca channels (medaka version), in S/cm^2.
-        Default is 0 S/cm^2.
-    taun : float, optional
-        Time constant of n (activation of I_K), in ms. Default is 30 ms.
-    vf : float, optional
-        Voltage value at the midpoint of f (activation of I_BK), in mV. Default
-        is -20 mV.
-    discard : {float, int}, optional
-        The first ms of the simulation to be discarded. Default is 0 ms.
-    simulation_time : {float, int}, optional
-        Simulation time in ms. Default is 5000 ms.
-    noise_amplitude : float, optional
-        The amplitude of the noise added to the model, in nA. If 0, no noise is
-        added. Note that the model uses adaptive timesteps if there is no noise,
-        and fixed timesteps with dt=0.01 if there is noise. Default is 0.
-    stimulus_amplitude : float, optional
-        The amplitude of the stimulus added to the model, in nA. Default is 0.
-
-    Returns
-    -------
-    time : array
-        Time array for the simulation.
-    voltage : array
-        Voltage array for the simulation.
-    """
-    time, voltage = medaka_1(g_l=g_l,
-                             e_pas=e_pas,
-                             g_K=g_K,
-                             g_Ca_rat=g_Ca_rat,
-                             g_SK=g_SK,
-                             g_BK=g_BK,
-                             tau_BK=tau_BK,
-                             g_Na=g_Na,
-                             g_Ca=g_Ca,
-                             taun=taun,
-                             vf=vf,
-                             simulation_time=simulation_time,
-                             noise_amplitude=noise_amplitude,
-                             stimulus_amplitude=stimulus_amplitude,
-                             discard=discard)
-
-    return time, voltage
-
-
-
-def medaka_1(g_l=g_l,
-             e_pas=-45,
-             g_K=g_K,
-             g_Ca_rat=g_Ca_rat,
-             g_SK=g_SK,
-             g_BK=3.2e-4,
-             tau_BK=5,
-             g_Na=g_Na,
-             g_Ca=g_Ca,
-             taun=taun,
-             vf=vf,
-             simulation_time=5000,
-             noise_amplitude=0,
-             stimulus_amplitude=0,
-             discard=0):
-    """
-    Medaka 1 neuron model of medaka cells in fish. Minimal changes from the
-    Tabak et. al. 2011 model for medaka cells in rat.
-
-    http://www.jneurosci.org/content/31/46/16855/tab-article-info
-
-    Parameters
-    ----------
-    g_l : float, optional
-        The leak conductance, in S/cm^2. Default is 6.37e-5 S/cm^2.
-    e_pas : float, optional
-        Reversal potential for the leak current, in mV. Default is -45 mV.
-    g_K : float, optional
-        The maximal conductance of K channels, in S/cm^2. Default is
-        9.55e-4 S/cm^2.
-    g_Ca_rat : float, optional
-        The maximal conductance of Ca channels (tabak version), in S/cm^2. Default is
-        0 S/cm^2.
-    g_SK : float, optional
-        The maximal conductance of SK channels, in S/cm^2. Default is
-        6.37e-4 S/cm^2.
-    g_BK : float, optional
-        The maximal conductance of BK channels, in S/cm^2. Default is 3.2e-4 S/cm^2.
-    tau_BK : float, optional
-        Time constant of the BK channel, in ms. Default is 5 ms.
+        The maximal conductance of BK channels, in S/cm^2. Default is 0 S/cm^2.
     g_Na: float, optional
         The maximal conductance of Na channels, in S/cm^2. Default is 0.07 S/cm^2.
     g_Ca : float, optional
         The maximal conductance of Ca channels (medaka version), in S/cm^2.
         Default is 2e-4 S/cm^2.
-    taun : float, optional
+    g_Ca_rat : float, optional
+        The maximal conductance of Ca channels (tabak version), in S/cm^2. Default is
+        0 S/cm^2.
+    E_leak : float, optional
+        Reversal potential for the leak current, in mV. Default is -45 mV.
+    tau_BK : float, optional
+        Time constant of the BK channel, in ms. Default is 5 ms.
+    tau_n : float, optional
         Time constant of n (activation of I_K), in ms. Default is 30 ms.
-    vf : float, optional
+    v_f : float, optional
         Voltage value at the midpoint of f (activation of I_BK), in mV. Default
         is -20 mV.
     discard : {float, int}, optional
@@ -381,7 +286,7 @@ def medaka_1(g_l=g_l,
     noise_amplitude : float, optional
         The amplitude of the noise added to the model, in nA. If 0, no noise is
         added. Note that the model uses adaptive timesteps if there is no noise,
-        and fixed timesteps with dt=0.01 if there is noise. Default is 0.
+        and fixed timesteps with dt = 0.25 if there is noise. Default is 0.
     stimulus_amplitude : float, optional
         The amplitude of the stimulus added to the model, in nA. Default is 0.
 
@@ -393,16 +298,16 @@ def medaka_1(g_l=g_l,
         Voltage array for the simulation.
     """
     soma = create_soma(g_l=g_l,
-                       e_pas=e_pas,
                        g_K=g_K,
-                       g_Ca_rat=g_Ca_rat,
                        g_SK=g_SK,
                        g_BK=g_BK,
-                       tau_BK=tau_BK,
                        g_Na=g_Na,
                        g_Ca=g_Ca,
-                       taun=taun,
-                       vf=vf)
+                       g_Ca_rat=g_Ca_rat,
+                       E_leak=E_leak,
+                       tau_BK=tau_BK,
+                       tau_n=tau_n,
+                       v_f=v_f)
 
     stim = insert_current_clamp(soma(0.5),
                                 duration=simulation_time,
@@ -415,17 +320,178 @@ def medaka_1(g_l=g_l,
     return time[time > discard], voltage[time > discard]
 
 
-def medaka_2(g_l=g_l,
-             e_pas=-45,
-             g_K=g_K*1.4,
-             g_Ca_rat=g_Ca_rat,
-             g_SK=g_SK*3,
-             g_BK=4*3.2e-4,
-             tau_BK=5,
+
+def rat(g_l=g_l,
+        g_K=g_K,
+        g_SK=g_SK,
+        g_BK=0,
+        g_Ca=6.37e-4,
+        E_leak=-50,
+        tau_BK=5,
+        tau_n=tau_n,
+        v_f=v_f,
+        simulation_time=5000,
+        noise_amplitude=0,
+        stimulus_amplitude=0,
+        discard=0):
+    """
+    Neuron model of pituitary cells in rat, reimplementation of Tabak et. al. 2011:
+
+    http://www.jneurosci.org/content/31/46/16855/tab-article-info
+
+    g_l : float, optional
+        The leak conductance, in S/cm^2. Default is 6.37e-5 S/cm^2.
+    g_K : float, optional
+        The maximal conductance of K channels, in S/cm^2. Default is
+        9.55e-4 S/cm^2.
+    g_SK : float, optional
+        The maximal conductance of SK channels, in S/cm^2. Default is
+        6.37e-4 S/cm^2.
+    g_BK : float, optional
+        The maximal conductance of BK channels, in S/cm^2. Default is 0 S/cm^2.
+    g_Na: float, optional
+        The maximal conductance of Na channels, in S/cm^2. Default is 0.07 S/cm^2.
+    g_Ca : float, optional
+        The maximal conductance of Ca channels (tabak version), in S/cm^2. Default is
+        6.37e-4 S/cm^2.
+    E_leak : float, optional
+        Reversal potential for the leak current, in mV. Default is -50 mV.
+    tau_BK : float, optional
+        Time constant of the BK channel, in ms. Default is 5 ms.
+    tau_n : float, optional
+        Time constant of n (activation of I_K), in ms. Default is 30 ms.
+    v_f : float, optional
+        Voltage value at the midpoint of f (activation of I_BK), in mV. Default
+        is -20 mV.
+    discard : {float, int}, optional
+        The first ms of the simulation to be discarded. Default is 0 ms.
+    simulation_time : {float, int}, optional
+        Simulation time in ms. Default is 5000 ms.
+    noise_amplitude : float, optional
+        The amplitude of the noise added to the model, in nA. If 0, no noise is
+        added. Note that the model uses adaptive timesteps if there is no noise,
+        and fixed timesteps with dt = 0.25 if there is noise. Default is 0.
+    stimulus_amplitude : float, optional
+        The amplitude of the stimulus added to the model, in nA. Default is 0.
+
+
+    Returns
+    -------
+    time : array
+        Time array for the simulation.
+    voltage : array
+        Voltage array for the simulation.
+    """
+    time, voltage = run_general_model(g_l=g_l,
+                                      g_K=g_K,
+                                      g_SK=g_SK,
+                                      g_BK=g_BK,
+                                      g_Na=0,
+                                      g_Ca=0,
+                                      g_Ca_rat=g_Ca,
+                                      E_leak=E_leak,
+                                      tau_BK=tau_BK,
+                                      tau_n=tau_n,
+                                      v_f=v_f,
+                                      simulation_time=simulation_time,
+                                      noise_amplitude=noise_amplitude,
+                                      stimulus_amplitude=stimulus_amplitude,
+                                      discard=discard)
+
+    return time, voltage
+
+
+
+def medaka_1(g_l=g_l,
+             g_K=g_K,
+             g_SK=g_SK,
+             g_BK=0,
              g_Na=g_Na,
              g_Ca=g_Ca,
-             taun=5,
-             vf=-15,
+             E_leak=-45,
+             tau_BK=5,
+             tau_n=tau_n,
+             v_f=v_f,
+             simulation_time=5000,
+             noise_amplitude=0,
+             stimulus_amplitude=0,
+             discard=0):
+    """
+    Run the model of pituitary cells. Default set of parameters is the same
+    as for medaka_1.
+
+    Parameters
+    ----------
+    g_l : float, optional
+        The leak conductance, in S/cm^2. Default is 6.37e-5 S/cm^2.
+    g_K : float, optional
+        The maximal conductance of K channels, in S/cm^2. Default is
+        9.55e-4 S/cm^2.
+    g_SK : float, optional
+        The maximal conductance of SK channels, in S/cm^2. Default is
+        6.37e-4 S/cm^2.
+    g_BK : float, optional
+        The maximal conductance of BK channels, in S/cm^2. Default is 0 S/cm^2.
+    g_Na: float, optional
+        The maximal conductance of Na channels, in S/cm^2. Default is 0.07 S/cm^2.
+    g_Ca : float, optional
+        The maximal conductance of Ca channels (medaka version), in S/cm^2.
+        Default is 2e-4 S/cm^2.
+    E_leak : float, optional
+        Reversal potential for the leak current, in mV. Default is -45 mV.
+    tau_BK : float, optional
+        Time constant of the BK channel, in ms. Default is 5 ms.
+    tau_n : float, optional
+        Time constant of n (activation of I_K), in ms. Default is 30 ms.
+    v_f : float, optional
+        Voltage value at the midpoint of f (activation of I_BK), in mV. Default
+        is -20 mV.
+    discard : {float, int}, optional
+        The first ms of the simulation to be discarded. Default is 0 ms.
+    simulation_time : {float, int}, optional
+        Simulation time in ms. Default is 5000 ms.
+    noise_amplitude : float, optional
+        The amplitude of the noise added to the model, in nA. If 0, no noise is
+        added. Note that the model uses adaptive timesteps if there is no noise,
+        and fixed timesteps with dt = 0.25 if there is noise. Default is 0.
+    stimulus_amplitude : float, optional
+        The amplitude of the stimulus added to the model, in nA. Default is 0.
+
+    Returns
+    -------
+    time : array
+        Time array for the simulation.
+    voltage : array
+        Voltage array for the simulation.
+    """
+    time, voltage = run_general_model(g_l=g_l,
+                                      g_K=g_K,
+                                      g_SK=g_SK,
+                                      g_BK=g_BK,
+                                      g_Na=g_Na,
+                                      g_Ca=g_Ca,
+                                      g_Ca_rat=0,
+                                      E_leak=E_leak,
+                                      tau_BK=tau_BK,
+                                      tau_n=tau_n,
+                                      v_f=v_f,
+                                      simulation_time=simulation_time,
+                                      noise_amplitude=noise_amplitude,
+                                      stimulus_amplitude=stimulus_amplitude,
+                                      discard=discard)
+    return time, voltage
+
+
+def medaka_2(g_l=g_l,
+             g_K=g_K*1.4,
+             g_SK=g_SK*3,
+             g_BK=4*3.2e-4,
+             g_Na=g_Na,
+             g_Ca=g_Ca,
+             E_leak=-45,
+             tau_BK=5,
+             tau_n=5,
+             v_f=-15,
              simulation_time=5000,
              noise_amplitude=0,
              stimulus_amplitude=0,
@@ -437,29 +503,26 @@ def medaka_2(g_l=g_l,
     ----------
     g_l : float, optional
         The leak conductance, in S/cm^2. Default is 6.37e-5 S/cm^2.
-    e_pas : float, optional
-        Reversal potential for the leak current, in mV. Default is -45 mV.
     g_K : float, optional
         The maximal conductance of K channels, in S/cm^2. Default is
         1.337e-3 S/cm^2.
-    g_Ca_rat : float, optional
-        The maximal conductance of Ca channels (tabak version), in S/cm^2. Default is
-        0 S/cm^2.
     g_SK : float, optional
         The maximal conductance of SK channels, in S/cm^2. Default is
         1.92e-3 S/cm^2.
     g_BK : float, optional
         The maximal conductance of BK channels, in S/cm^2. Default is 1.28e-3 S/cm^2.
-    tau_BK : float, optional
-        Time constant of the BK channel, in ms. Default is 5 ms.
     g_Na: float, optional
         The maximal conductance of Na channels, in S/cm^2. Default is 0.07 S/cm^2.
     g_Ca : float, optional
         The maximal conductance of Ca channels (medaka version), in S/cm^2.
         Default is 2e-4 S/cm^2.
-    taun : float, optional
+    E_leak : float, optional
+        Reversal potential for the leak current, in mV. Default is -45 mV.
+    tau_BK : float, optional
+        Time constant of the BK channel, in ms. Default is 5 ms.
+    tau_n : float, optional
         Time constant of n (activation of I_K), in ms. Default is 5 ms.
-    vf : float, optional
+    v_f : float, optional
         Voltage value at the midpoint of f (activation of I_BK), in mV. Default
         is -15 mV.
     discard : {float, int}, optional
@@ -469,7 +532,7 @@ def medaka_2(g_l=g_l,
     noise_amplitude : float, optional
         The amplitude of the noise added to the model, in nA. If 0, no noise is
         added. Note that the model uses adaptive timesteps if there is no noise,
-        and fixed timesteps with dt=0.01 if there is noise. Default is 0.
+        and fixed timesteps with dt = 0.25 if there is noise. Default is 0.
     stimulus_amplitude : float, optional
         The amplitude of the stimulus added to the model, in nA. Default is 0.
 
@@ -482,24 +545,24 @@ def medaka_2(g_l=g_l,
 
     Notes
     -----
-    Compared to Medaka 1, this model has changed the parameters g_K, g_BK, taun
-    and vf. The kinetics of the models are unchanged.
+    Compared to Medaka 1, this model has changed the parameters g_K, g_BK, tau_n
+    and v_f. The kinetics of the models are unchanged.
     """
-    time, voltage = medaka_1(g_l=g_l,
-                             e_pas=e_pas,
-                             g_K=g_K,
-                             g_Ca_rat=g_Ca_rat,
-                             g_SK=g_SK,
-                             g_BK=g_BK,
-                             tau_BK=tau_BK,
-                             g_Na=g_Na,
-                             g_Ca=g_Ca,
-                             taun=taun,
-                             vf=vf,
-                             simulation_time=simulation_time,
-                             noise_amplitude=noise_amplitude,
-                             stimulus_amplitude=stimulus_amplitude,
-                             discard=discard)
+    time, voltage = run_general_model(g_l=g_l,
+                                      g_K=g_K,
+                                      g_SK=g_SK,
+                                      g_BK=g_BK,
+                                      g_Na=g_Na,
+                                      g_Ca=g_Ca,
+                                      g_Ca_rat=0,
+                                      E_leak=E_leak,
+                                      tau_BK=tau_BK,
+                                      tau_n=tau_n,
+                                      v_f=v_f,
+                                      simulation_time=simulation_time,
+                                      noise_amplitude=noise_amplitude,
+                                      stimulus_amplitude=stimulus_amplitude,
+                                      discard=discard)
 
     return time, voltage
 
