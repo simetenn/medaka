@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1484271.svg)](https://doi.org/10.5281/zenodo.1484271)
+
 # NEURON model for endocrine pituitary cells in medaka
 
 An implementation of the NEURON models created for the article:
