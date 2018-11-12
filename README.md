@@ -23,7 +23,7 @@ The content of this folder is:
 We have created a [Docker](https://www.docker.com/) environment
 with all dependencies installed.
 This Docker environment can be started by running the bash script
-`run_docker.sh` from within the this directory.
+`run_docker.sh` from within this directory.
 All results have been created in this Docker environment.
 
 
