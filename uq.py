@@ -5,6 +5,7 @@ import chaospy as cp
 import numpy as np
 import matplotlib.pyplot as plt
 import string
+import os
 
 from burstiness import bursting, spiking, APs, min_spike_amplitude
 
