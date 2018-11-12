@@ -12,10 +12,10 @@ The content of this folder is:
 
 * `medaka.py` - contains the Medaka model implementation as the functions `rat` for RAT, `medaka_1` for MEDAKA 1 and `medaka_2` for MEDAKA 2.
 * `burstines.py` - contains the functions for calculating the burstiness.
-* `analysis.py` - contains the analysis of the medaka model.
-* `uq.py` - contains the uncertainty quantification and sensitivity analysis of the Medaka model.
+* `analysis.py` - contains the analysis of the models.
+* `uq.py` - contains the uncertainty quantification and sensitivity analysis of the models.
 * `*.mod` - NEURON files that implements the various ion channels.
-
+* `platform_information.py` - prints platform information.
 
 
 ## Docker environment
