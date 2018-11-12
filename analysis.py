@@ -86,7 +86,10 @@ def calculate_frequency_bf(model, **parameters):
 
     event_durations = duration(time, voltage)
 
-    binned_durations, bins = np.histogram(event_durations, bins=nr_bins, range=hist_range)
+    binned_durations, bins = np.histogram(event_durations,
+                                          bins=nr_bins,
+                                          range=hist_range)
+
     frequency = binned_durations/binned_durations.sum()
 
     burstiness_factor = burstiness(event_durations)
@@ -112,12 +115,15 @@ def change_g_BK(model, original_g_BK, **parameters):
         The burstiness factor for each g_BK.
     """
     scale_g_BKs = np.arange(0, 1.01, 0.025)
-    scale_g_BKs = [0, 0.5, 1]
 
     burstiness_factors = []
 
     for scale_g_BK in scale_g_BKs:
-        bins, frequency, burstiness_factor = calculate_frequency_bf(model=model, g_BK=original_g_BK*scale_g_BK, **parameters)
+        bins, frequency, burstiness_factor = \
+            calculate_frequency_bf(model=model,
+                                   g_BK=original_g_BK*scale_g_BK,
+                                   **parameters)
+
         burstiness_factors.append(burstiness_factor)
 
     return scale_g_BKs, burstiness_factors
@@ -131,103 +137,109 @@ def comparison_noise():
     as well as the histogram of the frequency event durations.
     Figure saved as comparison_noise.
     """
-    # g_bk => 0
     g_BK_scale = 0
 
     # Medaka 2
-    time_0, V_0 = medaka_2(noise_amplitude=noise_amplitude,
-                           discard=discard,
-                           g_BK=4*3.2e-4*g_BK_scale,
-                           simulation_time=simulation_time)
+    time_0_medaka_2, V_0_medaka_2 = medaka_2(noise_amplitude=noise_amplitude,
+                                             discard=discard,
+                                             g_BK=4*3.2e-4*g_BK_scale,
+                                             simulation_time=simulation_time)
 
-    bins_0, frequency_0, burstiness_factor_0 \
+    bins_0_medaka_2, frequency_0_medaka_2, burstiness_factor_0_medaka_2 \
         = calculate_frequency_bf(medaka_2, g_BK=4*3.2e-4*g_BK_scale)
 
     # Medaka 1
-    time_0_medaka, V_0_medaka = medaka_1(noise_amplitude=noise_amplitude,
-                                         discard=discard,
-                                         g_BK=3.2e-4*g_BK_scale,
-                                         simulation_time=simulation_time)
+    time_0_medaka_1, V_0_medaka_1 = medaka_1(noise_amplitude=noise_amplitude,
+                                             discard=discard,
+                                             g_BK=3.2e-4*g_BK_scale,
+                                             simulation_time=simulation_time)
 
-    bins_0_medaka, frequency_0_medaka, burstiness_factor_0_medaka \
+    bins_0_medaka_1, frequency_0_medaka_1, burstiness_factor_0_medaka_1 \
         = calculate_frequency_bf(medaka_1, g_BK=3.2e-4*g_BK_scale)
 
-    # Tabak
-    time_0_tabak, V_0_tabak = rat(noise_amplitude=noise_amplitude,
-                                  discard=discard,
-                                  g_BK=3.2e-4*g_BK_scale,
-                                  simulation_time=simulation_time)
+    # rat
+    time_0_rat, V_0_rat = rat(noise_amplitude=noise_amplitude,
+                              discard=discard,
+                              g_BK=3.2e-4*g_BK_scale,
+                              simulation_time=simulation_time)
 
-    bins_0_tabak, frequency_0_tabak, burstiness_factor_0_tabak \
+    bins_0_rat, frequency_0_rat, burstiness_factor_0_rat \
         = calculate_frequency_bf(rat, g_BK=3.2e-4*g_BK_scale)
 
 
+    g_BK_scale = 0.5
+
     # Medaka 2
-    time_05, V_05 = medaka_2(noise_amplitude=noise_amplitude,
-                             discard=discard,
-                             g_BK=4*3.2e-4*g_BK_scale,
-                             simulation_time=simulation_time)
+    time_05_medaka_2, V_05_medaka_2 = medaka_2(noise_amplitude=noise_amplitude,
+                                               discard=discard,
+                                               g_BK=4*3.2e-4*g_BK_scale,
+                                               simulation_time=simulation_time)
 
     bins_05, frequency_05, burstiness_factor_05 \
         = calculate_frequency_bf(medaka_2, g_BK=4*3.2e-4*g_BK_scale)
 
     # Medaka 1
-    time_05_medaka, V_05_medaka = medaka_1(noise_amplitude=noise_amplitude,
-                                         discard=discard,
-                                         g_BK=3.2e-4*g_BK_scale,
-                                         simulation_time=simulation_time)
+    time_05_medaka_1, V_05_medaka_1 = medaka_1(noise_amplitude=noise_amplitude,
+                                               discard=discard,
+                                               g_BK=3.2e-4*g_BK_scale,
+                                               simulation_time=simulation_time)
 
-    bins_05_medaka, frequency_05_medaka, burstiness_factor_05_medaka \
+    bins_05_medaka_1, frequency_05_medaka_1, burstiness_factor_05_medaka_1 \
         = calculate_frequency_bf(medaka_1, g_BK=3.2e-4*g_BK_scale)
 
 
-    # Tabak
-    time_05_tabak, V_05_tabak = rat(noise_amplitude=noise_amplitude,
-                                    discard=discard,
-                                    g_BK=3.2e-4*g_BK_scale,
-                                    simulation_time=simulation_time)
+    # rat
+    time_05_rat, V_05_rat = rat(noise_amplitude=noise_amplitude,
+                                discard=discard,
+                                g_BK=3.2e-4*g_BK_scale,
+                                simulation_time=simulation_time)
 
-    bins_05_tabak, frequency_05_tabak, burstiness_factor_05_tabak \
+    bins_05_rat, frequency_05_rat, burstiness_factor_05_rat \
         = calculate_frequency_bf(rat, g_BK=3.2e-4*g_BK_scale)
 
-    # g_bk => 1
+
     g_BK_scale = 1
 
     # Medaka 2
-    time_1, V_1 = medaka_2(noise_amplitude=noise_amplitude,
-                           discard=discard,
-                           g_BK=4*3.2e-4*g_BK_scale,
-                           simulation_time=simulation_time)
+    time_1_medaka_2, V_1_medaka_2 = medaka_2(noise_amplitude=noise_amplitude,
+                                             discard=discard,
+                                             g_BK=4*3.2e-4*g_BK_scale,
+                                             simulation_time=simulation_time)
 
-    bins_1, frequency_1, burstiness_factor_1 = \
+    bins_1_medaka_2, frequency_1_medaka_2, burstiness_factor_1_medaka_2 = \
         calculate_frequency_bf(medaka_2, g_BK=4*3.2e-4*g_BK_scale,)
 
     # Medaka 1
-    time_1_medaka, V_1_medaka = medaka_1(noise_amplitude=noise_amplitude,
-                                       discard=discard,
-                                       g_BK=3.2e-4*g_BK_scale,
-                                       simulation_time=simulation_time)
+    time_1_medaka_1, V_1_medaka_1 = medaka_1(noise_amplitude=noise_amplitude,
+                                             discard=discard,
+                                             g_BK=3.2e-4*g_BK_scale,
+                                             simulation_time=simulation_time)
 
-    bins_1_medaka, frequency_1_medaka, burstiness_factor_1_medaka \
+    bins_1_medaka_1, frequency_1_medaka_1, burstiness_factor_1_medaka_1 \
         = calculate_frequency_bf(medaka_1, g_BK=3.2e-4*g_BK_scale)
 
-    # Tabak
-    time_1_tabak, V_1_tabak = rat(noise_amplitude=noise_amplitude,
-                                  discard=discard,
-                                  g_BK=3.2e-4*g_BK_scale,
-                                  simulation_time=simulation_time)
+    # rat
+    time_1_rat, V_1_rat = rat(noise_amplitude=noise_amplitude,
+                              discard=discard,
+                              g_BK=3.2e-4*g_BK_scale,
+                              simulation_time=simulation_time)
 
-    bins_1_tabak, frequency_1_tabak, burstiness_factor_1_tabak \
+    bins_1_rat, frequency_1_rat, burstiness_factor_1_rat \
         = calculate_frequency_bf(rat, g_BK=3.2e-4*g_BK_scale)
 
     # Calculate results for figure 1D
 
     # Medaka 2
-    scaled_g_BKs, burstiness_factors_g_BK = change_g_BK(medaka_2, original_g_BK=4*3.2e-4)
+    scaled_g_BKs_medaka_2, burstiness_factors_g_BK_medaka_2 \
+        = change_g_BK(medaka_2, original_g_BK=4*3.2e-4)
+
     # Medaka 1
-    scaled_g_BKs_medaka, burstiness_factors_g_BK_medak = change_g_BK(medaka_1, original_g_BK=3.2e-4)
-    # Tabak
-    scaled_g_BKs_tabak, burstiness_factors_g_BK_tabak = change_g_BK(rat, original_g_BK=3.2e-4)
+    scaled_g_BKs_medaka_1, burstiness_factors_g_BK_medaka_1 \
+        = change_g_BK(medaka_1, original_g_BK=3.2e-4)
+
+    # rat
+    scaled_g_BKs_rat, burstiness_factors_g_BK_rat \
+        = change_g_BK(rat, original_g_BK=3.2e-4)
 
 
     # Plotting
@@ -249,38 +261,38 @@ def comparison_noise():
     voltage_axes = [ax1, ax2, ax3]
     burst_axes = [ax4, ax5, ax6]
 
-    time_1_tabak -= discard
-    time_1_medaka -= discard
-    time_1 -= discard
+    time_1_rat -= discard
+    time_1_medaka_1 -= discard
+    time_1_medaka_2 -= discard
 
-    time_05_tabak -= discard
-    time_05_medaka -= discard
-    time_05 -= discard
+    time_05_rat -= discard
+    time_05_medaka_1 -= discard
+    time_05_medaka_2 -= discard
 
-    time_0_tabak -= discard
-    time_0_medaka -= discard
-    time_0 -= discard
+    time_0_rat -= discard
+    time_0_medaka_1 -= discard
+    time_0_medaka_2 -= discard
 
-    ax1.plot(time_1_tabak, V_1_tabak, color="tab:gray")
-    ax1.plot(time_1_medaka, V_1_medaka, color="tab:blue")
-    ax1.plot(time_1, V_1, color="tab:red")
+    ax1.plot(time_1_rat, V_1_rat, color="tab:gray")
+    ax1.plot(time_1_medaka_1, V_1_medaka_1, color="tab:blue")
+    ax1.plot(time_1_medaka_2, V_1_medaka_2, color="tab:red")
     title = r"$1\cdot g_{\mathrm{BK}}$"
     ax1.set_title(title)
     ax1.text(label_x, label_y, r"\textbf{A}", transform=ax1.transAxes, fontsize=titlesize)
 
 
-    ax2.plot(time_05_tabak, V_05_tabak, color="tab:gray")
-    ax2.plot(time_05_medaka, V_05_medaka, color="tab:blue")
-    ax2.plot(time_05, V_05, color="tab:red")
+    ax2.plot(time_05_rat, V_05_rat, color="tab:gray")
+    ax2.plot(time_05_medaka_1, V_05_medaka_1, color="tab:blue")
+    ax2.plot(time_05_medaka_2, V_05_medaka_2, color="tab:red")
     title = r"$0.5\cdot g_{\mathrm{BK}}$"
     ax2.set_title(title)
     ax2.text(label_x, label_y, r"\textbf{B}", transform=ax2.transAxes, fontsize=titlesize)
 
 
 
-    ax3.plot(time_0_tabak, V_0_tabak, color="tab:gray")
-    ax3.plot(time_0_medaka, V_0_medaka, color="tab:blue")
-    ax3.plot(time_0, V_0, color="tab:red")
+    ax3.plot(time_0_rat, V_0_rat, color="tab:gray")
+    ax3.plot(time_0_medaka_1, V_0_medaka_1, color="tab:blue")
+    ax3.plot(time_0_medaka_2, V_0_medaka_2, color="tab:red")
     title = r"$0\cdot g_{\mathrm{BK}}$"
     ax3.set_title(title)
     ax3.text(label_x, label_y, r"\textbf{C}", transform=ax3.transAxes, fontsize=titlesize)
@@ -294,36 +306,36 @@ def comparison_noise():
 
 
 
-    ax4.bar(bins_1_medaka[:-1],
-            frequency_1_medaka,
-            width=(bins_1_medaka[1] - bins_1_medaka[0]),
+    ax4.bar(bins_1_medaka_1[:-1],
+            frequency_1_medaka_1,
+            width=(bins_1_medaka_1[1] - bins_1_medaka_1[0]),
             align="edge",
             color="tab:blue")
-    ax4.text(100, 0.75, "BF = {:.2f}".format(burstiness_factor_1_medaka), color="tab:blue")
+    ax4.text(100, 0.75, "BF = {:.2f}".format(burstiness_factor_1_medaka_1), color="tab:blue")
 
-    ax4.bar(bins_1[:-1],
-            frequency_1,
-            width=(bins_1[1] - bins_1[0]),
+    ax4.bar(bins_1_medaka_2[:-1],
+            frequency_1_medaka_2,
+            width=(bins_1_medaka_2[1] - bins_1_medaka_2[0]),
             align="edge",
             color="tab:red")
-    ax4.text(100, 0.6, "BF = {:.2f}".format(burstiness_factor_1), color="tab:red")
+    ax4.text(100, 0.6, "BF = {:.2f}".format(burstiness_factor_1_medaka_2), color="tab:red")
 
-    ax4.bar(bins_1_tabak[:-1],
-            frequency_1_tabak,
-            width=(bins_1_tabak[1] - bins_1_tabak[0]),
+    ax4.bar(bins_1_rat[:-1],
+            frequency_1_rat,
+            width=(bins_1_rat[1] - bins_1_rat[0]),
             align="edge",
             color="tab:grey")
-    ax4.text(100, 0.9, "BF = {:.2f}".format(burstiness_factor_1_tabak), color="tab:grey")
+    ax4.text(100, 0.9, "BF = {:.2f}".format(burstiness_factor_1_rat), color="tab:grey")
 
 
 
 
-    ax5.bar(bins_05_medaka[:-1],
-            frequency_05_medaka,
-            width=(bins_05_medaka[1] - bins_05_medaka[0]),
+    ax5.bar(bins_05_medaka_1[:-1],
+            frequency_05_medaka_1,
+            width=(bins_05_medaka_1[1] - bins_05_medaka_1[0]),
             align="edge",
             color="tab:blue")
-    ax5.text(100, 0.75, "BF = {:.2f}".format(burstiness_factor_05_medaka), color="tab:blue")
+    ax5.text(100, 0.75, "BF = {:.2f}".format(burstiness_factor_05_medaka_1), color="tab:blue")
 
     ax5.bar(bins_05[:-1],
             frequency_05,
@@ -332,34 +344,34 @@ def comparison_noise():
             color="tab:red")
     ax5.text(100, 0.6, "BF = {:.2f}".format(burstiness_factor_05), color="tab:red")
 
-    ax5.bar(bins_05_tabak[:-1],
-            frequency_05_tabak,
-            width=(bins_05_tabak[1] - bins_05_tabak[0]),
+    ax5.bar(bins_05_rat[:-1],
+            frequency_05_rat,
+            width=(bins_05_rat[1] - bins_05_rat[0]),
             align="edge",
             color="tab:grey")
-    ax5.text(100, 0.9, "BF = {:.2f}".format(burstiness_factor_05_tabak), color="tab:grey")
+    ax5.text(100, 0.9, "BF = {:.2f}".format(burstiness_factor_05_rat), color="tab:grey")
 
 
-    ax6.bar(bins_0_tabak[:-1],
-            frequency_0_tabak,
-            width=(bins_0_tabak[1] - bins_0_tabak[0]),
+    ax6.bar(bins_0_rat[:-1],
+            frequency_0_rat,
+            width=(bins_0_rat[1] - bins_0_rat[0]),
             align="edge",
             color="tab:grey")
-    ax6.text(100, 0.9, "BF = {:.2f}".format(burstiness_factor_0_tabak), color="tab:grey")
+    ax6.text(100, 0.9, "BF = {:.2f}".format(burstiness_factor_0_rat), color="tab:grey")
 
-    ax6.bar(bins_0_medaka[:-1],
-            frequency_0_medaka,
-            width=(bins_0_medaka[1] - bins_0_medaka[0]),
+    ax6.bar(bins_0_medaka_1[:-1],
+            frequency_0_medaka_1,
+            width=(bins_0_medaka_1[1] - bins_0_medaka_1[0]),
             align="edge",
             color="tab:blue")
-    ax6.text(100, 0.75, "BF = {:.2f}".format(burstiness_factor_0_medaka), color="tab:blue")
+    ax6.text(100, 0.75, "BF = {:.2f}".format(burstiness_factor_0_medaka_1), color="tab:blue")
 
-    ax6.bar(bins_0[:-1],
-            frequency_0,
-            width=(bins_0[1] - bins_0[0]),
+    ax6.bar(bins_0_medaka_2[:-1],
+            frequency_0_medaka_2,
+            width=(bins_0_medaka_2[1] - bins_0_medaka_2[0]),
             align="edge",
             color="tab:red")
-    ax6.text(100, 0.6, "BF = {:.2f}".format(burstiness_factor_0), color="tab:red")
+    ax6.text(100, 0.6, "BF = {:.2f}".format(burstiness_factor_0_medaka_2), color="tab:red")
 
     yticks = [0, 0.2,  0.4,  0.6,  0.8, 1]
     xticks = [0, 50,  100,  150,  200, 250]
@@ -376,9 +388,9 @@ def comparison_noise():
     ax6.set_xlabel("Event duration (ms)")
 
 
-    ax7.plot(scaled_g_BKs_tabak, burstiness_factors_g_BK_tabak, marker=".", color="tab:grey")
-    ax7.plot(scaled_g_BKs_medaka, burstiness_factors_g_BK_medak, marker=".", color="tab:blue")
-    ax7.plot(scaled_g_BKs, burstiness_factors_g_BK, marker=".", color="tab:red")
+    ax7.plot(scaled_g_BKs_rat, burstiness_factors_g_BK_rat, marker=".", color="tab:grey")
+    ax7.plot(scaled_g_BKs_medaka_1, burstiness_factors_g_BK_medaka_1, marker=".", color="tab:blue")
+    ax7.plot(scaled_g_BKs_medaka_2, burstiness_factors_g_BK_medaka_2, marker=".", color="tab:red")
     ax7.set_xlabel(r"$X \cdot g_{BK}$")
     ax7.set_ylabel("Burstiness")
     ax7.tick_params(axis="both", which="major", labelsize=fontsize, labelcolor="black")
@@ -416,66 +428,66 @@ def comparison_no_noise():
     noise_amplitude = 0
 
     # Medaka 2
-    time_0, V_0 = medaka_2(noise_amplitude=noise_amplitude,
-                           discard=discard,
-                           g_BK=4*3.2e-4*g_BK_scale,
-                           simulation_time=simulation_time_plot)
+    time_0_medaka_2, V_0_medaka_2 = medaka_2(noise_amplitude=noise_amplitude,
+                                             discard=discard,
+                                             g_BK=4*3.2e-4*g_BK_scale,
+                                             simulation_time=simulation_time_plot)
 
     # Medaka 1
-    time_0_medaka, V_0_medaka = medaka_1(noise_amplitude=noise_amplitude,
-                                       discard=discard,
-                                       g_BK=3.2e-4*g_BK_scale,
-                                       simulation_time=simulation_time_plot)
+    time_0_medaka_1, V_0_medaka_1 = medaka_1(noise_amplitude=noise_amplitude,
+                                             discard=discard,
+                                             g_BK=3.2e-4*g_BK_scale,
+                                             simulation_time=simulation_time_plot)
 
-    # Tabak
-    time_0_tabak, V_0_tabak = rat(noise_amplitude=noise_amplitude,
-                                  discard=discard,
-                                  g_BK=3.2e-4*g_BK_scale,
-                                  simulation_time=simulation_time_plot)
+    # rat
+    time_0_rat, V_0_rat = rat(noise_amplitude=noise_amplitude,
+                              discard=discard,
+                              g_BK=3.2e-4*g_BK_scale,
+                              simulation_time=simulation_time_plot)
 
 
     # g_bk => 0
     g_BK_scale = 0.16
 
     # Medaka 2
-    time_016, V_016 = medaka_2(noise_amplitude=noise_amplitude,
-                               discard=discard,
-                               g_BK=4*3.2e-4*g_BK_scale,
-                               simulation_time=simulation_time_plot)
+    time_016_medaka_2, V_016_medaka_2 = medaka_2(noise_amplitude=noise_amplitude,
+                                                 discard=discard,
+                                                 g_BK=4*3.2e-4*g_BK_scale,
+                                                 simulation_time=simulation_time_plot)
 
     # Medaka 1
-    time_016_medaka, V_016_medaka = medaka_1(noise_amplitude=noise_amplitude,
-                                           discard=discard,
-                                           g_BK=3.2e-4*g_BK_scale,
-                                           simulation_time=simulation_time_plot)
+    time_016_medaka_1, V_016_medaka_1 = medaka_1(noise_amplitude=noise_amplitude,
+                                                 discard=discard,
+                                                 g_BK=3.2e-4*g_BK_scale,
+                                                 simulation_time=simulation_time_plot)
 
-    # Tabak
-    time_016_tabak, V_016_tabak = rat(noise_amplitude=noise_amplitude,
-                                      discard=discard,
-                                      g_BK=3.2e-4*g_BK_scale,
-                                      simulation_time=simulation_time_plot)
+    # rat
+    time_016_rat, V_016_rat = rat(noise_amplitude=noise_amplitude,
+                                  discard=discard,
+                                  g_BK=3.2e-4*g_BK_scale,
+                                  simulation_time=simulation_time_plot)
 
 
     # g_bk => 0
     g_BK_scale = 0.2
 
     # Medaka 2
-    time_02, V_02 = medaka_2(noise_amplitude=noise_amplitude,
-                             discard=discard,
-                             g_BK=4*3.2e-4*g_BK_scale,
-                             simulation_time=simulation_time_plot)
+    time_02_medaka_2, V_02_medaka_2 = medaka_2(noise_amplitude=noise_amplitude,
+                                               discard=discard,
+                                               g_BK=4*3.2e-4*g_BK_scale,
+                                               simulation_time=simulation_time_plot)
 
     # Medaka 1
-    time_02_medaka, V_02_medaka = medaka_1(noise_amplitude=noise_amplitude,
-                                         discard=discard,
-                                         g_BK=3.2e-4*g_BK_scale,
-                                         simulation_time=simulation_time_plot)
+    time_02_medaka_1, V_02_medaka_1 = medaka_1(noise_amplitude=noise_amplitude,
+                                               discard=discard,
+                                               g_BK=3.2e-4*g_BK_scale,
+                                               simulation_time=simulation_time_plot)
 
-    # Tabak
-    time_02_tabak, V_02_tabak = rat(noise_amplitude=noise_amplitude,
-                                    discard=discard,
-                                    g_BK=3.2e-4*g_BK_scale,
-                                    simulation_time=simulation_time_plot)
+    # rat
+    time_02_rat, V_02_rat = rat(noise_amplitude=noise_amplitude,
+                                discard=discard,
+                                g_BK=3.2e-4*g_BK_scale,
+                                simulation_time=simulation_time_plot)
 
 
 
@@ -483,45 +495,45 @@ def comparison_no_noise():
     g_BK_scale = 0.5
 
     # Medaka 2
-    time_05, V_05 = medaka_2(noise_amplitude=noise_amplitude,
-                             discard=discard,
-                             g_BK=4*3.2e-4*g_BK_scale,
-                             simulation_time=simulation_time_plot)
+    time_05_medaka_2, V_05_medaka_2 = medaka_2(noise_amplitude=noise_amplitude,
+                                               discard=discard,
+                                               g_BK=4*3.2e-4*g_BK_scale,
+                                               simulation_time=simulation_time_plot)
 
         # Medaka 1
-    time_05_medaka, V_05_medaka = medaka_1(noise_amplitude=noise_amplitude,
-                                         discard=discard,
-                                         g_BK=3.2e-4*g_BK_scale,
-                                         simulation_time=simulation_time_plot)
+    time_05_medaka_1, V_05_medaka_1 = medaka_1(noise_amplitude=noise_amplitude,
+                                               discard=discard,
+                                               g_BK=3.2e-4*g_BK_scale,
+                                               simulation_time=simulation_time_plot)
 
 
-    # Tabak
-    time_05_tabak, V_05_tabak = rat(noise_amplitude=noise_amplitude,
-                                    discard=discard,
-                                    g_BK=3.2e-4*g_BK_scale,
-                                    simulation_time=simulation_time_plot)
+    # rat
+    time_05_rat, V_05_rat = rat(noise_amplitude=noise_amplitude,
+                                discard=discard,
+                                g_BK=3.2e-4*g_BK_scale,
+                                simulation_time=simulation_time_plot)
 
     # g_bk => 1
     g_BK_scale = 1
 
     # Medaka 2
-    time_1, V_1 = medaka_2(noise_amplitude=noise_amplitude,
-                           discard=discard,
-                           g_BK=4*3.2e-4*g_BK_scale,
-                           simulation_time=simulation_time_plot)
+    time_1_medaka_2, V_1_medaka_2 = medaka_2(noise_amplitude=noise_amplitude,
+                                             discard=discard,
+                                             g_BK=4*3.2e-4*g_BK_scale,
+                                             simulation_time=simulation_time_plot)
 
 
     # Medaka 1
-    time_1_medaka, V_1_medaka = medaka_1(noise_amplitude=noise_amplitude,
-                                       discard=discard,
-                                       g_BK=3.2e-4*g_BK_scale,
-                                       simulation_time=simulation_time_plot)
+    time_1_medaka_1, V_1_medaka_1 = medaka_1(noise_amplitude=noise_amplitude,
+                                             discard=discard,
+                                             g_BK=3.2e-4*g_BK_scale,
+                                             simulation_time=simulation_time_plot)
 
-    # Tabak
-    time_1_tabak, V_1_tabak = rat(noise_amplitude=noise_amplitude,
-                                  discard=discard,
-                                  g_BK=3.2e-4*g_BK_scale,
-                                  simulation_time=simulation_time_plot)
+    # rat
+    time_1_rat, V_1_rat = rat(noise_amplitude=noise_amplitude,
+                              discard=discard,
+                              g_BK=3.2e-4*g_BK_scale,
+                              simulation_time=simulation_time_plot)
 
 
     # Plotting
@@ -545,61 +557,61 @@ def comparison_no_noise():
     voltage_axes = [ax1, ax2, ax3, ax4, ax5]
     selection_axes = [ax6, ax7, ax8, ax9, ax10]
 
-    time_1_tabak -= discard
-    time_1_medaka -= discard
-    time_1 -= discard
+    time_1_rat -= discard
+    time_1_medaka_1 -= discard
+    time_1_medaka_2 -= discard
 
-    time_05_tabak -= discard
-    time_05_medaka -= discard
-    time_05 -= discard
+    time_05_rat -= discard
+    time_05_medaka_1 -= discard
+    time_05_medaka_2 -= discard
 
-    time_02_tabak -= discard
-    time_02_medaka -= discard
-    time_02 -= discard
+    time_02_rat -= discard
+    time_02_medaka_1 -= discard
+    time_02_medaka_2 -= discard
 
-    time_016_tabak -= discard
-    time_016_medaka -= discard
-    time_016 -= discard
+    time_016_rat -= discard
+    time_016_medaka_1 -= discard
+    time_016_medaka_2 -= discard
 
-    time_0_tabak -= discard
-    time_0_medaka -= discard
-    time_0 -= discard
+    time_0_rat -= discard
+    time_0_medaka_1 -= discard
+    time_0_medaka_2 -= discard
 
-    ax1.plot(time_1_tabak, V_1_tabak, color="tab:gray")
-    ax1.plot(time_1_medaka, V_1_medaka, color="tab:blue")
-    ax1.plot(time_1, V_1, color="tab:red")
+    ax1.plot(time_1_rat, V_1_rat, color="tab:gray")
+    ax1.plot(time_1_medaka_1, V_1_medaka_1, color="tab:blue")
+    ax1.plot(time_1_medaka_2, V_1_medaka_2, color="tab:red")
     title = r"$1\cdot g_{\mathrm{BK}}$"
     ax1.set_title(title)
     ax1.text(label_x, label_y, r"\textbf{A1}", transform=ax1.transAxes, fontsize=titlesize)
 
 
-    ax2.plot(time_05_tabak, V_05_tabak, color="tab:gray")
-    ax2.plot(time_05_medaka, V_05_medaka, color="tab:blue")
-    ax2.plot(time_05, V_05, color="tab:red")
+    ax2.plot(time_05_rat, V_05_rat, color="tab:gray")
+    ax2.plot(time_05_medaka_1, V_05_medaka_1, color="tab:blue")
+    ax2.plot(time_05_medaka_2, V_05_medaka_2, color="tab:red")
     title = r"$0.5\cdot g_{\mathrm{BK}}$"
     ax2.set_title(title)
     ax2.text(label_x, label_y, r"\textbf{B1}", transform=ax2.transAxes, fontsize=titlesize)
 
 
-    ax3.plot(time_02_tabak, V_02_tabak, color="tab:gray")
-    ax3.plot(time_02_medaka, V_02_medaka, color="tab:blue")
-    ax3.plot(time_02, V_02, color="tab:red")
+    ax3.plot(time_02_rat, V_02_rat, color="tab:gray")
+    ax3.plot(time_02_medaka_1, V_02_medaka_1, color="tab:blue")
+    ax3.plot(time_02_medaka_2, V_02_medaka_2, color="tab:red")
     title = r"$0.2\cdot g_{\mathrm{BK}}$"
     ax3.set_title(title)
     ax3.text(label_x, label_y, r"\textbf{C1}", transform=ax3.transAxes, fontsize=titlesize)
 
 
-    ax4.plot(time_016_tabak, V_016_tabak, color="tab:gray")
-    ax4.plot(time_016_medaka, V_016_medaka, color="tab:blue")
-    ax4.plot(time_016, V_016, color="tab:red")
+    ax4.plot(time_016_rat, V_016_rat, color="tab:gray")
+    ax4.plot(time_016_medaka_1, V_016_medaka_1, color="tab:blue")
+    ax4.plot(time_016_medaka_2, V_016_medaka_2, color="tab:red")
     title = r"$0.16\cdot g_{\mathrm{BK}}$"
     ax4.set_title(title)
     ax4.text(label_x, label_y, r"\textbf{D1}", transform=ax4.transAxes, fontsize=titlesize)
 
 
-    ax5.plot(time_0_tabak, V_0_tabak, color="tab:gray")
-    ax5.plot(time_0_medaka, V_0_medaka, color="tab:blue")
-    ax5.plot(time_0, V_0, color="tab:red")
+    ax5.plot(time_0_rat, V_0_rat, color="tab:gray")
+    ax5.plot(time_0_medaka_1, V_0_medaka_1, color="tab:blue")
+    ax5.plot(time_0_medaka_2, V_0_medaka_2, color="tab:red")
     title = r"$0\cdot g_{\mathrm{BK}}$"
     ax5.set_title(title)
     ax5.text(label_x, label_y, r"\textbf{E1}", transform=ax5.transAxes, fontsize=titlesize)
@@ -617,93 +629,93 @@ def comparison_no_noise():
     # Selections
     with open(output_file, "w") as output:
         # 1*g_bk
-        index = get_index(time_1_tabak, 2500)
-        tmp_time = time_1_tabak[index] - time_1_tabak[index].min()
-        ax6.plot(tmp_time, V_1_tabak[index], color="tab:gray")
-        output.write("1*g_bk RAT: " +  str(V_1_tabak[index].max()) + "\n")
+        index = get_index(time_1_rat, 2500)
+        tmp_time = time_1_rat[index] - time_1_rat[index].min()
+        ax6.plot(tmp_time, V_1_rat[index], color="tab:gray")
+        output.write("1*g_bk RAT: " +  str(V_1_rat[index].max()) + "\n")
 
-        index = get_index(time_1_medaka, 2400)
-        tmp_time = time_1_medaka[index] - time_1_medaka[index].min()
-        ax6.plot(tmp_time, V_1_medaka[index], color="tab:blue")
-        output.write("1*g_bk MEDAKA 1: " + str(V_1_medaka[index].max()) + "\n")
+        index = get_index(time_1_medaka_1, 2400)
+        tmp_time = time_1_medaka_1[index] - time_1_medaka_1[index].min()
+        ax6.plot(tmp_time, V_1_medaka_1[index], color="tab:blue")
+        output.write("1*g_bk MEDAKA 1: " + str(V_1_medaka_1[index].max()) + "\n")
 
-        index = get_index(time_1, 2320)
-        tmp_time = time_1[index] - time_1[index].min()
-        ax6.plot(tmp_time, V_1[index], color="tab:red")
+        index = get_index(time_1_medaka_2, 2320)
+        tmp_time = time_1_medaka_2[index] - time_1_medaka_2[index].min()
+        ax6.plot(tmp_time, V_1_medaka_2[index], color="tab:red")
         ax6.text(label_x + label_x_shift, label_y, r"\textbf{A2}", transform=ax6.transAxes, fontsize=titlesize)
         ax6.set_title("Action potential shape")
-        output.write("1*g_bk MEDAKA 2: " + str(V_1[index].max()) + "\n\n")
+        output.write("1*g_bk MEDAKA 2: " + str(V_1_medaka_2[index].max()) + "\n\n")
 
 
         # 0.5*g_bk
-        index = get_index(time_05_tabak, 2450)
-        tmp_time = time_05_tabak[index] - time_05_tabak[index].min()
-        ax7.plot(tmp_time, V_05_tabak[index], color="tab:gray")
-        output.write("0.5*g_bk RAT: " + str(V_05_tabak[index].max()) + "\n")
+        index = get_index(time_05_rat, 2450)
+        tmp_time = time_05_rat[index] - time_05_rat[index].min()
+        ax7.plot(tmp_time, V_05_rat[index], color="tab:gray")
+        output.write("0.5*g_bk RAT: " + str(V_05_rat[index].max()) + "\n")
 
-        index = get_index(time_05_medaka, 2570)
-        tmp_time = time_05_medaka[index] - time_05_medaka[index].min()
-        ax7.plot(tmp_time, V_05_medaka[index], color="tab:blue")
-        output.write("0.5*g_bk MEDAKA 1: " + str(V_05_medaka[index].max()) + "\n")
+        index = get_index(time_05_medaka_1, 2570)
+        tmp_time = time_05_medaka_1[index] - time_05_medaka_1[index].min()
+        ax7.plot(tmp_time, V_05_medaka_1[index], color="tab:blue")
+        output.write("0.5*g_bk MEDAKA 1: " + str(V_05_medaka_1[index].max()) + "\n")
 
-        index = get_index(time_05, 2000)
-        tmp_time = time_05[index] - time_05[index].min()
-        ax7.plot(tmp_time, V_05[index], color="tab:red")
+        index = get_index(time_05_medaka_2, 2000)
+        tmp_time = time_05_medaka_2[index] - time_05_medaka_2[index].min()
+        ax7.plot(tmp_time, V_05_medaka_2[index], color="tab:red")
         ax7.text(label_x + label_x_shift, label_y, r"\textbf{B2}", transform=ax7.transAxes, fontsize=titlesize)
-        output.write("0.5*g_bk MEDAKA 2: " + str(V_05[index].max()) + "\n\n")
+        output.write("0.5*g_bk MEDAKA 2: " + str(V_05_medaka_2[index].max()) + "\n\n")
 
 
         # 0.2*g_bk
-        index = get_index(time_02_tabak, 900)
-        tmp_time = time_02_tabak[index] - time_02_tabak[index].min()
-        ax8.plot(tmp_time, V_02_tabak[index], color="tab:gray")
-        output.write("0.2*g_bk RAT: " + str(V_02_tabak[index].max()) + "\n")
+        index = get_index(time_02_rat, 900)
+        tmp_time = time_02_rat[index] - time_02_rat[index].min()
+        ax8.plot(tmp_time, V_02_rat[index], color="tab:gray")
+        output.write("0.2*g_bk RAT: " + str(V_02_rat[index].max()) + "\n")
 
-        index = get_index(time_02_medaka, 1050)
-        tmp_time = time_02_medaka[index] - time_02_medaka[index].min()
-        ax8.plot(tmp_time, V_02_medaka[index], color="tab:blue")
-        output.write("0.2*g_bk MEDAKA 1: " + str(V_02_medaka[index].max()) + "\n")
+        index = get_index(time_02_medaka_1, 1050)
+        tmp_time = time_02_medaka_1[index] - time_02_medaka_1[index].min()
+        ax8.plot(tmp_time, V_02_medaka_1[index], color="tab:blue")
+        output.write("0.2*g_bk MEDAKA 1: " + str(V_02_medaka_1[index].max()) + "\n")
 
-        index = get_index(time_02, 1280)
-        tmp_time = time_02[index] - time_02[index].min()
-        ax8.plot(tmp_time, V_02[index], color="tab:red")
+        index = get_index(time_02_medaka_2, 1280)
+        tmp_time = time_02_medaka_2[index] - time_02_medaka_2[index].min()
+        ax8.plot(tmp_time, V_02_medaka_2[index], color="tab:red")
         ax8.text(label_x + label_x_shift, label_y, r"\textbf{C2}", transform=ax8.transAxes, fontsize=titlesize)
-        output.write("0.2*g_bk MEDAKA 2: " + str(V_02[index].max()) + "\n\n")
+        output.write("0.2*g_bk MEDAKA 2: " + str(V_02_medaka_2[index].max()) + "\n\n")
 
 
         # 0.16*g_bk
-        index = get_index(time_016_tabak, 3050)
-        tmp_time = time_016_tabak[index] - time_016_tabak[index].min()
-        ax9.plot(tmp_time, V_016_tabak[index], color="tab:gray")
-        output.write("0.16*g_bk RAT: " + str(V_016_tabak[index].max()) + "\n")
+        index = get_index(time_016_rat, 3050)
+        tmp_time = time_016_rat[index] - time_016_rat[index].min()
+        ax9.plot(tmp_time, V_016_rat[index], color="tab:gray")
+        output.write("0.16*g_bk RAT: " + str(V_016_rat[index].max()) + "\n")
 
-        index = get_index(time_016_medaka, 3350)
-        tmp_time = time_016_medaka[index] - time_016_medaka[index].min()
-        ax9.plot(tmp_time, V_016_medaka[index], color="tab:blue")
-        output.write("0.16*g_bk MEDAKA 1: " + str(V_016_medaka[index].max()) + "\n")
+        index = get_index(time_016_medaka_1, 3350)
+        tmp_time = time_016_medaka_1[index] - time_016_medaka_1[index].min()
+        ax9.plot(tmp_time, V_016_medaka_1[index], color="tab:blue")
+        output.write("0.16*g_bk MEDAKA 1: " + str(V_016_medaka_1[index].max()) + "\n")
 
-        index = get_index(time_016, 3100)
-        tmp_time = time_016[index] - time_016[index].min()
-        ax9.plot(tmp_time, V_016[index], color="tab:red")
+        index = get_index(time_016_medaka_2, 3100)
+        tmp_time = time_016_medaka_2[index] - time_016_medaka_2[index].min()
+        ax9.plot(tmp_time, V_016_medaka_2[index], color="tab:red")
         ax9.text(label_x + label_x_shift, label_y, r"\textbf{D2}", transform=ax9.transAxes, fontsize=titlesize)
-        output.write("0.16*g_bk MEDAKA 2: " + str(V_016[index].max()) + "\n\n")
+        output.write("0.16*g_bk MEDAKA 2: " + str(V_016_medaka_2[index].max()) + "\n\n")
 
 
         # 0*g_bk
-        index = get_index(time_0_tabak, 2000)
-        tmp_time = time_0_tabak[index] - time_0_tabak[index].min()
-        ax10.plot(tmp_time, V_0_tabak[index], color="tab:gray")
-        output.write("0*g_bk RAT: " + str(V_0_tabak[index].max()) + "\n")
+        index = get_index(time_0_rat, 2000)
+        tmp_time = time_0_rat[index] - time_0_rat[index].min()
+        ax10.plot(tmp_time, V_0_rat[index], color="tab:gray")
+        output.write("0*g_bk RAT: " + str(V_0_rat[index].max()) + "\n")
 
-        index = get_index(time_0_medaka, 2200)
-        tmp_time = time_0_medaka[index] - time_0_medaka[index].min()
-        ax10.plot(tmp_time, V_0_medaka[index], color="tab:blue")
-        output.write("0*g_bk MEDAKA 1: " + str(V_0_medaka[index].max()) + "\n")
+        index = get_index(time_0_medaka_1, 2200)
+        tmp_time = time_0_medaka_1[index] - time_0_medaka_1[index].min()
+        ax10.plot(tmp_time, V_0_medaka_1[index], color="tab:blue")
+        output.write("0*g_bk MEDAKA 1: " + str(V_0_medaka_1[index].max()) + "\n")
 
-        index = get_index(time_0, 3850)
-        tmp_time = time_0[index] - time_0[index].min()
-        ax10.plot(tmp_time, V_0[index], color="tab:red")
-        output.write("0*g_bk MEDAKA 2:" + str(V_0[index].max()) + "\n")
+        index = get_index(time_0_medaka_2, 3850)
+        tmp_time = time_0_medaka_2[index] - time_0_medaka_2[index].min()
+        ax10.plot(tmp_time, V_0_medaka_2[index], color="tab:red")
+        output.write("0*g_bk MEDAKA 2:" + str(V_0_medaka_2[index].max()) + "\n")
 
 
     ax10.set_xlabel("Relative time (ms)", fontsize=labelsize)
