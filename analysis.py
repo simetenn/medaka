@@ -629,7 +629,7 @@ def comparison_no_noise():
     # Selections
     with open(output_file, "w") as output:
         # 1*g_bk
-        index = get_index(time_1_rat, 2500)
+        index = get_index(time_1_rat, 2550)
         tmp_time = time_1_rat[index] - time_1_rat[index].min()
         ax6.plot(tmp_time, V_1_rat[index], color="tab:gray")
         output.write("1*g_bk RAT: " +  str(V_1_rat[index].max()) + "\n")
@@ -648,7 +648,7 @@ def comparison_no_noise():
 
 
         # 0.5*g_bk
-        index = get_index(time_05_rat, 2450)
+        index = get_index(time_05_rat, 2700)
         tmp_time = time_05_rat[index] - time_05_rat[index].min()
         ax7.plot(tmp_time, V_05_rat[index], color="tab:gray")
         output.write("0.5*g_bk RAT: " + str(V_05_rat[index].max()) + "\n")
@@ -666,7 +666,7 @@ def comparison_no_noise():
 
 
         # 0.2*g_bk
-        index = get_index(time_02_rat, 900)
+        index = get_index(time_02_rat, 890)
         tmp_time = time_02_rat[index] - time_02_rat[index].min()
         ax8.plot(tmp_time, V_02_rat[index], color="tab:gray")
         output.write("0.2*g_bk RAT: " + str(V_02_rat[index].max()) + "\n")
@@ -684,7 +684,7 @@ def comparison_no_noise():
 
 
         # 0.16*g_bk
-        index = get_index(time_016_rat, 3050)
+        index = get_index(time_016_rat, 3210)
         tmp_time = time_016_rat[index] - time_016_rat[index].min()
         ax9.plot(tmp_time, V_016_rat[index], color="tab:gray")
         output.write("0.16*g_bk RAT: " + str(V_016_rat[index].max()) + "\n")
@@ -702,7 +702,7 @@ def comparison_no_noise():
 
 
         # 0*g_bk
-        index = get_index(time_0_rat, 2000)
+        index = get_index(time_0_rat, 1970)
         tmp_time = time_0_rat[index] - time_0_rat[index].min()
         ax10.plot(tmp_time, V_0_rat[index], color="tab:gray")
         output.write("0*g_bk RAT: " + str(V_0_rat[index].max()) + "\n")
@@ -754,5 +754,5 @@ def comparison_no_noise():
 
 
 if __name__ == "__main__":
-    comparison_noise()
+    # comparison_noise()
     comparison_no_noise()
