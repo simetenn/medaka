@@ -6,10 +6,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import string
 
-from medaka import scale_conductance
 from burstiness import bursting, spiking, APs, min_spike_amplitude
 
-from uncertainpy.plotting.prettyplot.prettyplot import prettyBar, set_latex_font, set_style, spines_color, prettyPlot, create_figure
+from uncertainpy.plotting.prettyplot.prettyplot import prettyBar, set_latex_font, set_style, spines_color, prettyPlot
 
 
 # Plotting parameters
@@ -18,7 +17,7 @@ titlesize = 12
 labelsize = 10
 fontsize = 8
 figure_format = ".eps"
-figure_folder = "figures/"
+figure_folder = "figures"
 
 
 # Simulation parameters
@@ -54,7 +53,6 @@ def plot_sobol_feature(data, feature, ax):
 
     latex_labels = {"g_K": r"$g_\mathrm{K}$",
                     "g_Ca": r"$g_\mathrm{Ca}$",
-                    "g_Ca_rat": r"$g_\mathrm{Ca}$",
                     "g_SK": r"$g_\mathrm{SK}$",
                     "g_Na": r"$g_\mathrm{Na}$",
                     "g_l": r"$g_\mathrm{l}$",
@@ -65,7 +63,7 @@ def plot_sobol_feature(data, feature, ax):
     for label in data.uncertain_parameters:
         xlabels.append(latex_labels[label])
 
-        if feature.lower()  in ["medaka", "medaka_2"]:
+        if feature.lower()  in ["rat", "medaka_1", "medaka_2"]:
             title = "Membrane potential"
         else:
             title = feature.replace("_", " ")
@@ -102,9 +100,15 @@ def plot_sobol_feature(data, feature, ax):
 
         ax.set_ylim([0, 1.15])
         ax.set_title(title, fontsize=titlesize)
-        ax.text(0.25, 0.9, "Mean = {mean:.2{c}} {unit}".format(mean=mean, c="e" if (abs(mean) < 1e-2 and mean != 0) else "f", unit=unit),
+        ax.text(0.25, 0.9,
+                "Mean = {mean:.2{c}} {unit}".format(mean=mean,
+                                                    c="e" if (abs(mean) < 1e-2 and mean != 0) else "f",
+                                                    unit=unit),
                 transform=ax.transAxes, fontsize=fontsize)
-        ax.text(0.25, 0.78, "Std. = {std:.2{c}} {unit}".format(std=std, c="e" if (abs(mean) < 1e-2 and mean != 0) else "f", unit=unit),
+        ax.text(0.25, 0.78,
+                "Std. = {std:.2{c}} {unit}".format(std=std,
+                                                   c="e" if (abs(mean) < 1e-2 and mean != 0) else "f",
+                                                   unit=unit),
                 transform=ax.transAxes, fontsize=fontsize)
 
         ax.tick_params(labelsize=fontsize)
@@ -112,16 +116,16 @@ def plot_sobol_feature(data, feature, ax):
 
 
 
-def plot_compare(tabak, medaka_1, medaka_2):
+def plot_compare(rat, medaka_1, medaka_2):
     """
-    Plot the total-order Sobol indices for the three models, tabak,
+    Plot the total-order Sobol indices for the three models, rat,
     medaka 1 and medaka 2.
 
     Parameters
     ----------
-    tabak : uncertainpy.Data
+    rat : uncertainpy.Data
         A data object that contains the results from the uncertainty
-        quantification of the tabak model.
+        quantification of the rat model.
     medaka_1 : uncertainpy.Data
         A data object that contains the results from the uncertainty
         quantification of the medaka 1 model.
@@ -149,7 +153,7 @@ def plot_compare(tabak, medaka_1, medaka_2):
 
 
     features = ["bursting", "spiking", "APs"]
-    datas = [tabak, medaka_1, medaka_2]
+    datas = [rat, medaka_1, medaka_2]
 
     yticks = np.arange(0, 1.1, 0.25)
 
@@ -159,7 +163,10 @@ def plot_compare(tabak, medaka_1, medaka_2):
 
             plot_sobol_feature(datas[i], features[j], ax)
 
-            ax.text(-0.17, 1.08, "\\textbf{{{}}}".format(string.ascii_uppercase[i] + str(j + 1)), transform=ax.transAxes, fontsize=titlesize)
+            ax.text(-0.17, 1.08,
+                    "\\textbf{{{}}}".format(string.ascii_uppercase[i] + str(j + 1)),
+                    transform=ax.transAxes,
+                    fontsize=titlesize)
             ax.set_title("")
             ax.set_yticks(yticks)
 
@@ -174,28 +181,28 @@ def plot_compare(tabak, medaka_1, medaka_2):
 
     plt.tight_layout()
     plt.subplots_adjust(left=0.17)
-    plt.savefig(figure_folder + "sensitivity" + figure_format)
+    plt.savefig(os.path.join(figure_folder, "sensitivity" + figure_format))
 
     plt.rcdefaults()
 
 
 
-def uq_tabak():
+def uq_rat():
     """
     Perform the uncertainty quantification and sensitivity analysis of the
-    tabak model.
+    rat model.
 
     Returns
     -------
     data : uncertainpy.Data
         A data object that contains the results from the uncertainty
-        quantification of the tabak model.
+        quantification of the rat model.
     """
     parameters = {"g_K": 9.55e-4,
-                  "g_Ca_rat": 6.34e-4,
+                  "g_Ca": 6.34e-4,
                   "g_SK": 6.34e-4,
                   "g_l": 6.34e-5,
-                  "g_BK": 2.4e-4}
+                  "g_BK": 2.4e-4} # Temporary value only
 
     parameters = un.Parameters(parameters)
 
@@ -203,6 +210,7 @@ def uq_tabak():
     # within a +/- 50% interval around their original value
     parameters.set_all_distributions(un.uniform(1))
 
+    # Set full g_BK distribution
     parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4)
 
     # Initialize the features
@@ -233,8 +241,7 @@ def uq_tabak():
     # We set the seed to easier be able to reproduce the result
     data = UQ.quantify(seed=10,
                        plot=None,
-                       figure_folder="tabak",
-                       filename="tabak",
+                       filename="rat",
                        polynomial_order=polynomial_order,
                        save=False)
 
@@ -257,7 +264,7 @@ def uq_medaka_1():
                   "g_SK": 6.37e-4,
                   "g_Na": 0.07,
                   "g_l": 6.37e-5,
-                  "g_BK": 2.4e-4}
+                  "g_BK": 2.4e-4}  # Temporary value only
 
     parameters = un.Parameters(parameters)
 
@@ -265,6 +272,7 @@ def uq_medaka_1():
     # within a +/- 50% interval around their original value
     parameters.set_all_distributions(un.uniform(1))
 
+    # Set full g_BK distribution
     parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4)
 
     # Initialize the features
@@ -280,7 +288,7 @@ def uq_medaka_1():
 
     # Initialize the model and defining default options
     model = un.NeuronModel(file="medaka.py",
-                           name="medaka",
+                           name="medaka_1",
                            discard=discard,
                            noise_amplitude=noise_amplitude,
                            simulation_time=simulation_time,
@@ -294,7 +302,6 @@ def uq_medaka_1():
     # We set the seed to easier be able to reproduce the result
     data = UQ.quantify(seed=10,
                        plot=None,
-                       figure_folder="medaka_1",
                        filename="medaka_1",
                        polynomial_order=polynomial_order,
                        save=False)
@@ -322,7 +329,7 @@ def uq_medaka_2():
                   "g_SK": 6.37e-4*3,
                   "g_Na": 0.07,
                   "g_l": 6.37e-5,
-                  "g_BK": 3.2e-4*4*0.67}
+                  "g_BK": 3.2e-4*4*0.67}  # Temporary value only
 
     parameters = un.Parameters(parameters)
 
@@ -330,6 +337,7 @@ def uq_medaka_2():
     # within a +/- 50% interval around their original value
     parameters.set_all_distributions(un.uniform(1))
 
+    # Set full g_BK distribution
     parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4*4)
 
     # Initialize the features
@@ -358,7 +366,6 @@ def uq_medaka_2():
 
     # We set the seed to easier be able to reproduce the result
     data = UQ.quantify(seed=10,
-                       figure_folder="medaka_2",
                        filename="medaka_2",
                        plot=None,
                        polynomial_order=polynomial_order,
@@ -370,20 +377,20 @@ def uq_medaka_2():
 def compare():
     """
     Perform the uncertainty quantification and sensitivity analysis of the
-    tabak, medaka 1 and medaka 2 models and compare the total-order Sobol
+    rat, medaka 1 and medaka 2 models and compare the total-order Sobol
     indices of the .
 
     Returns
     -------
     data : uncertainpy.Data
         A data object that contains the results from the uncertainty
-        quantification of the tabak model.
+        quantification of the rat model.
     """
-    data_tabak = uq_tabak()
+    data_rat = uq_rat()
     data_medaka_1 = uq_medaka_1()
     data_medaka_2 = uq_medaka_2()
 
-    plot_compare(data_tabak, data_medaka_1, data_medaka_2)
+    plot_compare(data_rat, data_medaka_1, data_medaka_2)
 
 
 if __name__ == "__main__":
