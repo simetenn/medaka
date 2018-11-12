@@ -11,33 +11,6 @@ dt = 0.25 # ms
 
 A = 3.1415927e-6 # cm^2
 
-def scale_conductance(G_x):
-    """
-    Rescale the conductances from from Tabak et. al. 2011 (nS) to the conductances
-    required by neuron (S/cm^2).
-
-    Parameters
-    ----------
-    G_x : {float, int}
-        Conductance from Tabak et. al. 2011 in nS.
-
-    Returns
-    -------
-    G_x_scaled : {float, int}
-        Conductance rescaled to what neuron requires (S/cm^2). The cell has an area
-        of 3.1415927e-6 cm^2.
-
-
-    Notes
-    -----
-    Area of neuron cell:  3.1415927e-6 cm^2
-
-    g_x_scaled  (S/cm2) = G_{x} (nS) * 1e-9 (S/nS) / A (cm^2) ~=  G_x * 1.6 * 10^-4 (S/cm^2)
-    """
-    g_x_scaled = G_x*1e-9/A
-
-    return g_x_scaled
-
 
 c_NEURON = 10*1e-6/A
 alpha_NEURON = 0.0015*A*10**6
