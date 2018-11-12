@@ -6,7 +6,7 @@ import os
 
 from matplotlib.patches import Patch
 
-from medaka import medaka, medaka_2
+from medaka import rat, medaka_1, medaka_2
 from burstiness import burstiness, duration, burst_threshold
 
 
@@ -112,6 +112,7 @@ def change_g_BK(model, original_g_BK, **parameters):
         The burstiness factor for each g_BK.
     """
     scale_g_BKs = np.arange(0, 1.01, 0.025)
+    scale_g_BKs = [0, 0.5, 1]
 
     burstiness_factors = []
 
@@ -143,29 +144,22 @@ def comparison_noise():
         = calculate_frequency_bf(medaka_2, g_BK=4*3.2e-4*g_BK_scale)
 
     # Medaka 1
-    time_0_medaka, V_0_medaka = medaka(noise_amplitude=noise_amplitude,
-                                       discard=discard,
-                                       g_BK=3.2e-4*g_BK_scale,
-                                       simulation_time=simulation_time)
+    time_0_medaka, V_0_medaka = medaka_1(noise_amplitude=noise_amplitude,
+                                         discard=discard,
+                                         g_BK=3.2e-4*g_BK_scale,
+                                         simulation_time=simulation_time)
 
     bins_0_medaka, frequency_0_medaka, burstiness_factor_0_medaka \
-        = calculate_frequency_bf(medaka, g_BK=3.2e-4*g_BK_scale)
+        = calculate_frequency_bf(medaka_1, g_BK=3.2e-4*g_BK_scale)
 
     # Tabak
-    time_0_tabak, V_0_tabak = medaka(noise_amplitude=noise_amplitude,
-                                     discard=discard,
-                                     g_BK=3.2e-4*g_BK_scale,
-                                     g_Ca_tabak=6.37e-4,
-                                     g_Na=0,
-                                     g_Ca=0,
-                                     simulation_time=simulation_time)
+    time_0_tabak, V_0_tabak = rat(noise_amplitude=noise_amplitude,
+                                  discard=discard,
+                                  g_BK=3.2e-4*g_BK_scale,
+                                  simulation_time=simulation_time)
 
     bins_0_tabak, frequency_0_tabak, burstiness_factor_0_tabak \
-        = calculate_frequency_bf(medaka,
-                                 g_BK=3.2e-4*g_BK_scale,
-                                 g_Ca_tabak=6.37e-4,
-                                 g_Na=0,
-                                 g_Ca=0)
+        = calculate_frequency_bf(rat, g_BK=3.2e-4*g_BK_scale)
 
 
     # Medaka 2
@@ -178,30 +172,23 @@ def comparison_noise():
         = calculate_frequency_bf(medaka_2, g_BK=4*3.2e-4*g_BK_scale)
 
     # Medaka 1
-    time_05_medaka, V_05_medaka = medaka(noise_amplitude=noise_amplitude,
+    time_05_medaka, V_05_medaka = medaka_1(noise_amplitude=noise_amplitude,
                                          discard=discard,
                                          g_BK=3.2e-4*g_BK_scale,
                                          simulation_time=simulation_time)
 
     bins_05_medaka, frequency_05_medaka, burstiness_factor_05_medaka \
-        = calculate_frequency_bf(medaka, g_BK=3.2e-4*g_BK_scale)
+        = calculate_frequency_bf(medaka_1, g_BK=3.2e-4*g_BK_scale)
 
 
     # Tabak
-    time_05_tabak, V_05_tabak = medaka(noise_amplitude=noise_amplitude,
-                                       discard=discard,
-                                       g_BK=3.2e-4*g_BK_scale,
-                                       g_Ca_tabak=6.37e-4,
-                                       g_Na=0,
-                                       g_Ca=0,
-                                       simulation_time=simulation_time)
+    time_05_tabak, V_05_tabak = rat(noise_amplitude=noise_amplitude,
+                                    discard=discard,
+                                    g_BK=3.2e-4*g_BK_scale,
+                                    simulation_time=simulation_time)
 
     bins_05_tabak, frequency_05_tabak, burstiness_factor_05_tabak \
-        = calculate_frequency_bf(medaka,
-                                 g_BK=3.2e-4*g_BK_scale,
-                                 g_Ca_tabak=6.37e-4,
-                                 g_Na=0,
-                                 g_Ca=0)
+        = calculate_frequency_bf(rat, g_BK=3.2e-4*g_BK_scale)
 
     # g_bk => 1
     g_BK_scale = 1
@@ -216,42 +203,31 @@ def comparison_noise():
         calculate_frequency_bf(medaka_2, g_BK=4*3.2e-4*g_BK_scale,)
 
     # Medaka 1
-    time_1_medaka, V_1_medaka = medaka(noise_amplitude=noise_amplitude,
+    time_1_medaka, V_1_medaka = medaka_1(noise_amplitude=noise_amplitude,
                                        discard=discard,
                                        g_BK=3.2e-4*g_BK_scale,
                                        simulation_time=simulation_time)
 
     bins_1_medaka, frequency_1_medaka, burstiness_factor_1_medaka \
-        = calculate_frequency_bf(medaka, g_BK=3.2e-4*g_BK_scale)
+        = calculate_frequency_bf(medaka_1, g_BK=3.2e-4*g_BK_scale)
 
     # Tabak
-    time_1_tabak, V_1_tabak = medaka(noise_amplitude=noise_amplitude,
-                                     discard=discard,
-                                     g_BK=3.2e-4*g_BK_scale,
-                                     g_Ca_tabak=6.37e-4,
-                                     g_Na=0,
-                                     g_Ca=0,
-                                     simulation_time=simulation_time)
+    time_1_tabak, V_1_tabak = rat(noise_amplitude=noise_amplitude,
+                                  discard=discard,
+                                  g_BK=3.2e-4*g_BK_scale,
+                                  simulation_time=simulation_time)
 
     bins_1_tabak, frequency_1_tabak, burstiness_factor_1_tabak \
-        = calculate_frequency_bf(medaka,
-                                 g_BK=3.2e-4*g_BK_scale,
-                                 g_Ca_tabak=6.37e-4,
-                                 g_Na=0,
-                                 g_Ca=0)
+        = calculate_frequency_bf(rat, g_BK=3.2e-4*g_BK_scale)
 
     # Calculate results for figure 1D
 
     # Medaka 2
     scaled_g_BKs, burstiness_factors_g_BK = change_g_BK(medaka_2, original_g_BK=4*3.2e-4)
     # Medaka 1
-    scaled_g_BKs_medaka, burstiness_factors_g_BK_medak = change_g_BK(medaka, original_g_BK=3.2e-4)
+    scaled_g_BKs_medaka, burstiness_factors_g_BK_medak = change_g_BK(medaka_1, original_g_BK=3.2e-4)
     # Tabak
-    scaled_g_BKs_tabak, burstiness_factors_g_BK_tabak = change_g_BK(medaka,
-                                                                    original_g_BK=3.2e-4,
-                                                                    g_Ca_tabak=6.37e-4,
-                                                                    g_Na=0,
-                                                                    g_Ca=0)
+    scaled_g_BKs_tabak, burstiness_factors_g_BK_tabak = change_g_BK(rat, original_g_BK=3.2e-4)
 
 
     # Plotting
@@ -446,19 +422,16 @@ def comparison_no_noise():
                            simulation_time=simulation_time_plot)
 
     # Medaka 1
-    time_0_medaka, V_0_medaka = medaka(noise_amplitude=noise_amplitude,
+    time_0_medaka, V_0_medaka = medaka_1(noise_amplitude=noise_amplitude,
                                        discard=discard,
                                        g_BK=3.2e-4*g_BK_scale,
                                        simulation_time=simulation_time_plot)
 
     # Tabak
-    time_0_tabak, V_0_tabak = medaka(noise_amplitude=noise_amplitude,
-                                     discard=discard,
-                                     g_BK=3.2e-4*g_BK_scale,
-                                     g_Ca_tabak=6.37e-4,
-                                     g_Na=0,
-                                     g_Ca=0,
-                                     simulation_time=simulation_time_plot)
+    time_0_tabak, V_0_tabak = rat(noise_amplitude=noise_amplitude,
+                                  discard=discard,
+                                  g_BK=3.2e-4*g_BK_scale,
+                                  simulation_time=simulation_time_plot)
 
 
     # g_bk => 0
@@ -471,19 +444,16 @@ def comparison_no_noise():
                                simulation_time=simulation_time_plot)
 
     # Medaka 1
-    time_016_medaka, V_016_medaka = medaka(noise_amplitude=noise_amplitude,
+    time_016_medaka, V_016_medaka = medaka_1(noise_amplitude=noise_amplitude,
                                            discard=discard,
                                            g_BK=3.2e-4*g_BK_scale,
                                            simulation_time=simulation_time_plot)
 
     # Tabak
-    time_016_tabak, V_016_tabak = medaka(noise_amplitude=noise_amplitude,
-                                         discard=discard,
-                                         g_BK=3.2e-4*g_BK_scale,
-                                         g_Ca_tabak=6.37e-4,
-                                         g_Na=0,
-                                         g_Ca=0,
-                                         simulation_time=simulation_time_plot)
+    time_016_tabak, V_016_tabak = rat(noise_amplitude=noise_amplitude,
+                                      discard=discard,
+                                      g_BK=3.2e-4*g_BK_scale,
+                                      simulation_time=simulation_time_plot)
 
 
     # g_bk => 0
@@ -496,19 +466,16 @@ def comparison_no_noise():
                              simulation_time=simulation_time_plot)
 
     # Medaka 1
-    time_02_medaka, V_02_medaka = medaka(noise_amplitude=noise_amplitude,
+    time_02_medaka, V_02_medaka = medaka_1(noise_amplitude=noise_amplitude,
                                          discard=discard,
                                          g_BK=3.2e-4*g_BK_scale,
                                          simulation_time=simulation_time_plot)
 
     # Tabak
-    time_02_tabak, V_02_tabak = medaka(noise_amplitude=noise_amplitude,
-                                       discard=discard,
-                                       g_BK=3.2e-4*g_BK_scale,
-                                       g_Ca_tabak=6.37e-4,
-                                       g_Na=0,
-                                       g_Ca=0,
-                                       simulation_time=simulation_time_plot)
+    time_02_tabak, V_02_tabak = rat(noise_amplitude=noise_amplitude,
+                                    discard=discard,
+                                    g_BK=3.2e-4*g_BK_scale,
+                                    simulation_time=simulation_time_plot)
 
 
 
@@ -522,20 +489,17 @@ def comparison_no_noise():
                              simulation_time=simulation_time_plot)
 
         # Medaka 1
-    time_05_medaka, V_05_medaka = medaka(noise_amplitude=noise_amplitude,
+    time_05_medaka, V_05_medaka = medaka_1(noise_amplitude=noise_amplitude,
                                          discard=discard,
                                          g_BK=3.2e-4*g_BK_scale,
                                          simulation_time=simulation_time_plot)
 
 
     # Tabak
-    time_05_tabak, V_05_tabak = medaka(noise_amplitude=noise_amplitude,
-                                       discard=discard,
-                                       g_BK=3.2e-4*g_BK_scale,
-                                       g_Ca_tabak=6.37e-4,
-                                       g_Na=0,
-                                       g_Ca=0,
-                                       simulation_time=simulation_time_plot)
+    time_05_tabak, V_05_tabak = rat(noise_amplitude=noise_amplitude,
+                                    discard=discard,
+                                    g_BK=3.2e-4*g_BK_scale,
+                                    simulation_time=simulation_time_plot)
 
     # g_bk => 1
     g_BK_scale = 1
@@ -548,19 +512,16 @@ def comparison_no_noise():
 
 
     # Medaka 1
-    time_1_medaka, V_1_medaka = medaka(noise_amplitude=noise_amplitude,
+    time_1_medaka, V_1_medaka = medaka_1(noise_amplitude=noise_amplitude,
                                        discard=discard,
                                        g_BK=3.2e-4*g_BK_scale,
                                        simulation_time=simulation_time_plot)
 
     # Tabak
-    time_1_tabak, V_1_tabak = medaka(noise_amplitude=noise_amplitude,
-                                     discard=discard,
-                                     g_BK=3.2e-4*g_BK_scale,
-                                     g_Ca_tabak=6.37e-4,
-                                     g_Na=0,
-                                     g_Ca=0,
-                                     simulation_time=simulation_time_plot)
+    time_1_tabak, V_1_tabak = rat(noise_amplitude=noise_amplitude,
+                                  discard=discard,
+                                  g_BK=3.2e-4*g_BK_scale,
+                                  simulation_time=simulation_time_plot)
 
 
     # Plotting

@@ -54,7 +54,7 @@ def plot_sobol_feature(data, feature, ax):
 
     latex_labels = {"g_K": r"$g_\mathrm{K}$",
                     "g_Ca": r"$g_\mathrm{Ca}$",
-                    "g_Ca_tabak": r"$g_\mathrm{Ca}$",
+                    "g_Ca_rat": r"$g_\mathrm{Ca}$",
                     "g_SK": r"$g_\mathrm{SK}$",
                     "g_Na": r"$g_\mathrm{Na}$",
                     "g_l": r"$g_\mathrm{l}$",
@@ -192,9 +192,9 @@ def uq_tabak():
         quantification of the tabak model.
     """
     parameters = {"g_K": 9.55e-4,
-                  "g_Ca_tabak": 6.37e-4,
-                  "g_SK": 6.37e-4,
-                  "g_l": 6.37e-5,
+                  "g_Ca_rat": 6.34e-4,
+                  "g_SK": 6.34e-4,
+                  "g_l": 6.34e-5,
                   "g_BK": 2.4e-4}
 
     parameters = un.Parameters(parameters)
@@ -219,14 +219,11 @@ def uq_tabak():
 
     # Initialize the model and defining default options
     model = un.NeuronModel(file="medaka.py",
-                           name="medaka",
+                           name="rat",
                            discard=discard,
                            noise_amplitude=noise_amplitude,
                            simulation_time=simulation_time,
-                           ignore=True,
-                           g_Ca_tabak=6.37e-4,
-                           g_Na=0,
-                           g_Ca=0)
+                           ignore=True)
 
     # Perform the uncertainty quantification
     UQ = un.UncertaintyQuantification(model,
