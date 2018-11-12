@@ -1,8 +1,10 @@
-# NEURON model for endocrine pituitary cells in Medaka
+# NEURON model for endocrine pituitary cells in medaka
 
 An implementation of the NEURON models created for the article:
 "BK channels have opposite effects on sodium versus calcium mediated action potentials in endocrine pituitary cells.",
 and all analysis of the models.
+
+
 
 
 ## Docker environment
@@ -58,16 +60,16 @@ python uq.py
 
 This takes around 4 minutes on a workstation computer.
 
-
 ## Content
 
 The content of this folder is:
 
-* `medaka.py` - contains the Medaka model implementation as the functions `medaka_1` for MEDAKA 1 and `medaka_2` for MEDAKA 2.
+* `medaka.py` - contains the Medaka model implementation as the functions `rat` for RAT, `medaka_1` for MEDAKA 1 and `medaka_2` for MEDAKA 2.
 * `burstines.py` - contains the functions for calculating the burstiness.
 * `analysis.py` - contains the analysis of the Medaka model.
 * `uq.py` - contains the uncertainty quantification and sensitivity analysis of the Medaka model.
 * `*.mod` - NEURON files that implements the various ion channels.
+
 
 ## Platform and package specifications
 
