@@ -6,7 +6,7 @@ import os
 
 from matplotlib.patches import Patch
 
-from medaka import scale_conductance, medaka, medaka_2
+from medaka import medaka, medaka_2
 from burstiness import burstiness, duration, burst_threshold
 
 
@@ -80,9 +80,9 @@ def calculate_frequency_bf(model, **parameters):
     nr_bins = 40
     hist_range = (0, 250)
     time, voltage = model(noise_amplitude=noise_amplitude,
-                           discard=discard,
-                           simulation_time=simulation_time,
-                           **parameters)
+                          discard=discard,
+                          simulation_time=simulation_time,
+                          **parameters)
 
     event_durations = duration(time, voltage)
 
@@ -111,8 +111,6 @@ def change_g_BK(model, original_g_BK, **parameters):
     burstiness_factors : list
         The burstiness factor for each g_BK.
     """
-    g_BKs = np.arange(0., 0.33, 0.01)/1000
-
     scale_g_BKs = np.arange(0, 1.01, 0.025)
 
     burstiness_factors = []
@@ -141,7 +139,8 @@ def comparison_noise():
                            g_BK=4*3.2e-4*g_BK_scale,
                            simulation_time=simulation_time)
 
-    bins_0, frequency_0, burstiness_factor_0 = calculate_frequency_bf(medaka_2, g_BK=4*3.2e-4*g_BK_scale)
+    bins_0, frequency_0, burstiness_factor_0 \
+        = calculate_frequency_bf(medaka_2, g_BK=4*3.2e-4*g_BK_scale)
 
     # Medaka 1
     time_0_medaka, V_0_medaka = medaka(noise_amplitude=noise_amplitude,
@@ -149,7 +148,8 @@ def comparison_noise():
                                        g_BK=3.2e-4*g_BK_scale,
                                        simulation_time=simulation_time)
 
-    bins_0_medaka, frequency_0_medaka, burstiness_factor_0_medaka = calculate_frequency_bf(medaka, g_BK=3.2e-4*g_BK_scale)
+    bins_0_medaka, frequency_0_medaka, burstiness_factor_0_medaka \
+        = calculate_frequency_bf(medaka, g_BK=3.2e-4*g_BK_scale)
 
     # Tabak
     time_0_tabak, V_0_tabak = medaka(noise_amplitude=noise_amplitude,
@@ -160,11 +160,12 @@ def comparison_noise():
                                      g_Ca=0,
                                      simulation_time=simulation_time)
 
-    bins_0_tabak, frequency_0_tabak, burstiness_factor_0_tabak = calculate_frequency_bf(medaka,
-                                                                                        g_BK=3.2e-4*g_BK_scale,
-                                                                                        g_Ca_tabak=6.37e-4,
-                                                                                        g_Na=0,
-                                                                                        g_Ca=0)
+    bins_0_tabak, frequency_0_tabak, burstiness_factor_0_tabak \
+        = calculate_frequency_bf(medaka,
+                                 g_BK=3.2e-4*g_BK_scale,
+                                 g_Ca_tabak=6.37e-4,
+                                 g_Na=0,
+                                 g_Ca=0)
 
 
     # Medaka 2
@@ -173,7 +174,8 @@ def comparison_noise():
                              g_BK=4*3.2e-4*g_BK_scale,
                              simulation_time=simulation_time)
 
-    bins_05, frequency_05, burstiness_factor_05 = calculate_frequency_bf(medaka_2, g_BK=4*3.2e-4*g_BK_scale)
+    bins_05, frequency_05, burstiness_factor_05 \
+        = calculate_frequency_bf(medaka_2, g_BK=4*3.2e-4*g_BK_scale)
 
     # Medaka 1
     time_05_medaka, V_05_medaka = medaka(noise_amplitude=noise_amplitude,
@@ -181,7 +183,8 @@ def comparison_noise():
                                          g_BK=3.2e-4*g_BK_scale,
                                          simulation_time=simulation_time)
 
-    bins_05_medaka, frequency_05_medaka, burstiness_factor_05_medaka = calculate_frequency_bf(medaka, g_BK=3.2e-4*g_BK_scale,)
+    bins_05_medaka, frequency_05_medaka, burstiness_factor_05_medaka \
+        = calculate_frequency_bf(medaka, g_BK=3.2e-4*g_BK_scale)
 
 
     # Tabak
@@ -193,11 +196,12 @@ def comparison_noise():
                                        g_Ca=0,
                                        simulation_time=simulation_time)
 
-    bins_05_tabak, frequency_05_tabak, burstiness_factor_05_tabak = calculate_frequency_bf(medaka,
-                                                                                           g_BK=3.2e-4*g_BK_scale,
-                                                                                           g_Ca_tabak=6.37e-4,
-                                                                                           g_Na=0,
-                                                                                           g_Ca=0)
+    bins_05_tabak, frequency_05_tabak, burstiness_factor_05_tabak \
+        = calculate_frequency_bf(medaka,
+                                 g_BK=3.2e-4*g_BK_scale,
+                                 g_Ca_tabak=6.37e-4,
+                                 g_Na=0,
+                                 g_Ca=0)
 
     # g_bk => 1
     g_BK_scale = 1
@@ -208,7 +212,8 @@ def comparison_noise():
                            g_BK=4*3.2e-4*g_BK_scale,
                            simulation_time=simulation_time)
 
-    bins_1, frequency_1, burstiness_factor_1 = calculate_frequency_bf(medaka_2, g_BK=4*3.2e-4*g_BK_scale,)
+    bins_1, frequency_1, burstiness_factor_1 = \
+        calculate_frequency_bf(medaka_2, g_BK=4*3.2e-4*g_BK_scale,)
 
     # Medaka 1
     time_1_medaka, V_1_medaka = medaka(noise_amplitude=noise_amplitude,
@@ -216,7 +221,8 @@ def comparison_noise():
                                        g_BK=3.2e-4*g_BK_scale,
                                        simulation_time=simulation_time)
 
-    bins_1_medaka, frequency_1_medaka, burstiness_factor_1_medaka = calculate_frequency_bf(medaka, g_BK=3.2e-4*g_BK_scale)
+    bins_1_medaka, frequency_1_medaka, burstiness_factor_1_medaka \
+        = calculate_frequency_bf(medaka, g_BK=3.2e-4*g_BK_scale)
 
     # Tabak
     time_1_tabak, V_1_tabak = medaka(noise_amplitude=noise_amplitude,
@@ -227,11 +233,12 @@ def comparison_noise():
                                      g_Ca=0,
                                      simulation_time=simulation_time)
 
-    bins_1_tabak, frequency_1_tabak, burstiness_factor_1_tabak = calculate_frequency_bf(medaka,
-                                                                                        g_BK=3.2e-4*g_BK_scale,
-                                                                                        g_Ca_tabak=6.37e-4,
-                                                                                        g_Na=0,
-                                                                                        g_Ca=0)
+    bins_1_tabak, frequency_1_tabak, burstiness_factor_1_tabak \
+        = calculate_frequency_bf(medaka,
+                                 g_BK=3.2e-4*g_BK_scale,
+                                 g_Ca_tabak=6.37e-4,
+                                 g_Na=0,
+                                 g_Ca=0)
 
     # Calculate results for figure 1D
 
@@ -707,7 +714,7 @@ def comparison_no_noise():
         index = get_index(time_016_tabak, 3050)
         tmp_time = time_016_tabak[index] - time_016_tabak[index].min()
         ax9.plot(tmp_time, V_016_tabak[index], color="tab:gray")
-        output.write("0.16*g_bk RAT: " + str(V_016_tabak[index].max() + "\n"))
+        output.write("0.16*g_bk RAT: " + str(V_016_tabak[index].max()) + "\n")
 
         index = get_index(time_016_medaka, 3350)
         tmp_time = time_016_medaka[index] - time_016_medaka[index].min()
@@ -741,8 +748,6 @@ def comparison_no_noise():
     ax10.set_xlabel("Relative time (ms)", fontsize=labelsize)
     ax10.text(label_x + label_x_shift, label_y, r"\textbf{E2}", transform=ax10.transAxes, fontsize=titlesize)
 
-
-    yticks = [-60, -40, -20, 0, 20]
 
     for ax in voltage_axes:
         ax.set_ylabel("V (mV)")
