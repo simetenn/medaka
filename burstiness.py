@@ -5,7 +5,7 @@ import uncertainpy as un
 
 
 onset_threshold = 0.55          # fraction of the normalized voltage
-burst_threshold = 60            # in ms
+burst_threshold = 60            # ms
 end_threshold = -0.1            # Relative to the onset_threshold
 min_spike_amplitude = 10        # mV
 
@@ -112,6 +112,7 @@ def bursting(time, spikes, info):
     return None, found_bursts
 
 
+
 def spiking(time, spikes, info):
     """
     If the model has spikes or not. Is one if the model has at least one spike
@@ -139,6 +140,7 @@ def spiking(time, spikes, info):
             break
 
     return None, found_spike
+
 
 
 def APs(time, spikes, info):
