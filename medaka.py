@@ -19,7 +19,7 @@ g_l = 6.37e-5              # S/cm^2
 g_Ca_rat = 0               # S/cm^2
 g_SK = 6.37e-4             # S/cm^2
 g_Na = 0.07                # S/cm^2
-g_Ca = 2e-4                # S/cm^2
+g_Ca = 2e-4                # m/s
 g_K = 9.55e-4              # S/cm^2
 tau_n = 30
 v_f = -20
@@ -53,8 +53,8 @@ def create_soma(g_l=g_l,
     g_Na: float, optional
         The maximal conductance of Na channels, in S/cm^2. Default is 0.07 S/cm^2.
     g_Ca : float, optional
-        The maximal conductance of Ca channels (medaka version), in S/cm^2.
-        Default is 2e-4 S/cm^2.
+        The maximal permeability of Ca channels (medaka version), in S/cm^2.
+        Default is 2e-4 cm/s.
     g_Ca_rat : float, optional
         The maximal conductance of Ca channels (tabak version), in S/cm^2. Default is
         0 S/cm^2.
@@ -265,8 +265,8 @@ def run_general_model(g_l=g_l,
     g_Na: float, optional
         The maximal conductance of Na channels, in S/cm^2. Default is 0.07 S/cm^2.
     g_Ca : float, optional
-        The maximal conductance of Ca channels (medaka version), in S/cm^2.
-        Default is 2e-4 S/cm^2.
+        The maximal permeability of Ca channels (medaka version), in cm/s.
+        Default is 2e-4 cm/s.
     g_Ca_rat : float, optional
         The maximal conductance of Ca channels (tabak version), in S/cm^2. Default is
         0 S/cm^2.
@@ -352,8 +352,8 @@ def rat(g_l=g_l,
     g_Na: float, optional
         The maximal conductance of Na channels, in S/cm^2. Default is 0.07 S/cm^2.
     g_Ca : float, optional
-        The maximal conductance of Ca channels (tabak version), in S/cm^2. Default is
-        6.37e-4 S/cm^2.
+        The maximal permeability of Ca channels (tabak version), in cm/s. Default is
+        6.37e-4 cm/s.
     E_leak : float, optional
         Reversal potential for the leak current, in mV. Default is -50 mV.
     tau_BK : float, optional
@@ -435,8 +435,8 @@ def medaka_1(g_l=g_l,
     g_Na: float, optional
         The maximal conductance of Na channels, in S/cm^2. Default is 0.07 S/cm^2.
     g_Ca : float, optional
-        The maximal conductance of Ca channels (medaka version), in S/cm^2.
-        Default is 2e-4 S/cm^2.
+        The maximal permeability of Ca channels (medaka version), in cm/s.
+        Default is 2e-4 cm/s.
     E_leak : float, optional
         Reversal potential for the leak current, in mV. Default is -45 mV.
     tau_BK : float, optional
@@ -514,8 +514,8 @@ def medaka_2(g_l=g_l,
     g_Na: float, optional
         The maximal conductance of Na channels, in S/cm^2. Default is 0.07 S/cm^2.
     g_Ca : float, optional
-        The maximal conductance of Ca channels (medaka version), in S/cm^2.
-        Default is 2e-4 S/cm^2.
+        The maximal permeability of Ca channels (medaka version), in cm/s.
+        Default is 2e-4 in cm/s.
     E_leak : float, optional
         Reversal potential for the leak current, in mV. Default is -45 mV.
     tau_BK : float, optional
