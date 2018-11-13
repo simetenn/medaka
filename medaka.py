@@ -21,7 +21,7 @@ g_SK = 6.37e-4             # S/cm^2
 g_Na = 0.07                # S/cm^2
 g_Ca = 2e-4                # m/s
 g_K = 9.55e-4              # S/cm^2
-tau_n = 30
+tau_K = 30
 v_f = -20
 
 def create_soma(g_l=g_l,
@@ -33,7 +33,7 @@ def create_soma(g_l=g_l,
                 g_Ca_rat=g_Ca_rat,
                 E_leak=-45,
                 tau_BK=5,
-                tau_n=tau_n,
+                tau_K=tau_K,
                 v_f=v_f):
     """
     Create the soma of a neuron.
@@ -62,8 +62,8 @@ def create_soma(g_l=g_l,
         Reversal potential for the leak current, in mV. Default is -45 mV.
     tau_BK : float, optional
         Time constant of the BK channel, in ms. Default is 5 ms.
-    tau_n : float, optional
-        Time constant of n (activation of I_K), in ms. Default is 30 ms.
+    tau_K : float, optional
+        Time constant of I_K (n gating variable), in ms. Default is 30 ms.
     v_f : float, optional
         Voltage value at the midpoint of f (activation of I_BK), in mV. Default
         is -20 mV.
@@ -107,7 +107,7 @@ def create_soma(g_l=g_l,
             seg.ghvat_ihvat = g_Ca_rat
             seg.gskbar_sk = g_SK
             seg.gbk_bk = g_BK
-            seg.taun_kdrt = tau_n
+            seg.taun_kdrt = tau_K
             seg.vf_bk = v_f
 
             # TODO Check these
@@ -240,7 +240,7 @@ def run_general_model(g_l=g_l,
                       g_Ca_rat=g_Ca_rat,
                       E_leak=-45,
                       tau_BK=5,
-                      tau_n=tau_n,
+                      tau_K=tau_K,
                       v_f=v_f,
                       simulation_time=5000,
                       noise_amplitude=0,
@@ -274,8 +274,8 @@ def run_general_model(g_l=g_l,
         Reversal potential for the leak current, in mV. Default is -45 mV.
     tau_BK : float, optional
         Time constant of the BK channel, in ms. Default is 5 ms.
-    tau_n : float, optional
-        Time constant of n (activation of I_K), in ms. Default is 30 ms.
+    tau_K : float, optional
+        Time constant of I_K (n gating variable), in ms. Default is 30 ms.
     v_f : float, optional
         Voltage value at the midpoint of f (activation of I_BK), in mV. Default
         is -20 mV.
@@ -306,7 +306,7 @@ def run_general_model(g_l=g_l,
                        g_Ca_rat=g_Ca_rat,
                        E_leak=E_leak,
                        tau_BK=tau_BK,
-                       tau_n=tau_n,
+                       tau_K=tau_K,
                        v_f=v_f)
 
     stim = insert_current_clamp(soma(0.5),
@@ -328,7 +328,7 @@ def rat(g_l=g_l,
         g_Ca=6.37e-4,
         E_leak=-50,
         tau_BK=5,
-        tau_n=tau_n,
+        tau_K=tau_K,
         v_f=v_f,
         simulation_time=5000,
         noise_amplitude=0,
@@ -358,8 +358,8 @@ def rat(g_l=g_l,
         Reversal potential for the leak current, in mV. Default is -50 mV.
     tau_BK : float, optional
         Time constant of the BK channel, in ms. Default is 5 ms.
-    tau_n : float, optional
-        Time constant of n (activation of I_K), in ms. Default is 30 ms.
+    tau_K : float, optional
+        Time constant of I_K (n gating variable), in ms. Default is 30 ms.
     v_f : float, optional
         Voltage value at the midpoint of f (activation of I_BK), in mV. Default
         is -20 mV.
@@ -391,7 +391,7 @@ def rat(g_l=g_l,
                                       g_Ca_rat=g_Ca,
                                       E_leak=E_leak,
                                       tau_BK=tau_BK,
-                                      tau_n=tau_n,
+                                      tau_K=tau_K,
                                       v_f=v_f,
                                       simulation_time=simulation_time,
                                       noise_amplitude=noise_amplitude,
@@ -410,7 +410,7 @@ def medaka_1(g_l=g_l,
              g_Ca=g_Ca,
              E_leak=-45,
              tau_BK=5,
-             tau_n=tau_n,
+             tau_K=tau_K,
              v_f=v_f,
              simulation_time=5000,
              noise_amplitude=0,
@@ -441,8 +441,8 @@ def medaka_1(g_l=g_l,
         Reversal potential for the leak current, in mV. Default is -45 mV.
     tau_BK : float, optional
         Time constant of the BK channel, in ms. Default is 5 ms.
-    tau_n : float, optional
-        Time constant of n (activation of I_K), in ms. Default is 30 ms.
+    tau_K : float, optional
+        Time constant of I_K (n gating variable), in ms. Default is 30 ms.
     v_f : float, optional
         Voltage value at the midpoint of f (activation of I_BK), in mV. Default
         is -20 mV.
@@ -473,7 +473,7 @@ def medaka_1(g_l=g_l,
                                       g_Ca_rat=0,
                                       E_leak=E_leak,
                                       tau_BK=tau_BK,
-                                      tau_n=tau_n,
+                                      tau_K=tau_K,
                                       v_f=v_f,
                                       simulation_time=simulation_time,
                                       noise_amplitude=noise_amplitude,
@@ -490,7 +490,7 @@ def medaka_2(g_l=g_l,
              g_Ca=g_Ca,
              E_leak=-45,
              tau_BK=5,
-             tau_n=5,
+             tau_K=5,
              v_f=-15,
              simulation_time=5000,
              noise_amplitude=0,
@@ -520,8 +520,8 @@ def medaka_2(g_l=g_l,
         Reversal potential for the leak current, in mV. Default is -45 mV.
     tau_BK : float, optional
         Time constant of the BK channel, in ms. Default is 5 ms.
-    tau_n : float, optional
-        Time constant of n (activation of I_K), in ms. Default is 5 ms.
+    tau_K : float, optional
+        Time constant of I_K (n gating variable), in ms. Default is 5 ms.
     v_f : float, optional
         Voltage value at the midpoint of f (activation of I_BK), in mV. Default
         is -15 mV.
@@ -545,7 +545,7 @@ def medaka_2(g_l=g_l,
 
     Notes
     -----
-    Compared to Medaka 1, this model has changed the parameters g_K, g_BK, tau_n
+    Compared to Medaka 1, this model has changed the parameters g_K, g_BK, tau_K
     and v_f. The kinetics of the models are unchanged.
     """
     time, voltage = run_general_model(g_l=g_l,
@@ -557,7 +557,7 @@ def medaka_2(g_l=g_l,
                                       g_Ca_rat=0,
                                       E_leak=E_leak,
                                       tau_BK=tau_BK,
-                                      tau_n=tau_n,
+                                      tau_K=tau_K,
                                       v_f=v_f,
                                       simulation_time=simulation_time,
                                       noise_amplitude=noise_amplitude,
