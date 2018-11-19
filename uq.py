@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import string
 import os
 
-from burstiness import bursting, spiking, APs, min_spike_amplitude
+from burstiness import is_bursting, is_regular, is_spiking, min_spike_amplitude
 
 from uncertainpy.plotting.prettyplot.prettyplot import prettyBar, set_latex_font, set_style, spines_color, prettyPlot
 
@@ -29,7 +29,7 @@ stimulus_amplitude = 0         # nA
 
 # Uncertainty quantification parameters
 polynomial_order = 5
-features_to_run = ["spiking", "bursting", "APs"]
+features_to_run = ["is_regular", "is_bursting", "is_spiking"]
 
 
 
@@ -153,7 +153,7 @@ def plot_compare(rat, medaka_1, medaka_2):
     ax.set_ylabel('Total-order Sobol indices', labelpad=65, fontsize=labelsize)
 
 
-    features = ["bursting", "spiking", "APs"]
+    features = ["is_bursting", "is_regular", "is_spiking"]
     datas = [rat, medaka_1, medaka_2]
 
     yticks = np.arange(0, 1.1, 0.25)
@@ -172,9 +172,9 @@ def plot_compare(rat, medaka_1, medaka_2):
             ax.set_yticks(yticks)
 
 
-    axes[0][0].set_title("Bursting")
-    axes[0][1].set_title("Regular spiking")
-    axes[0][2].set_title("AP firing")
+    axes[0][0].set_title("Isbursting")
+    axes[0][1].set_title("Isregular")
+    axes[0][2].set_title("Isfiring")
 
     axes[0][0].set_ylabel("RAT", labelpad=12)
     axes[1][0].set_ylabel("MEDAKA 1", labelpad=12)
@@ -215,7 +215,7 @@ def uq_rat():
     parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4)
 
     # Initialize the features
-    features = un.SpikingFeatures(new_features=[bursting, spiking, APs],
+    features = un.SpikingFeatures(new_features=[is_bursting, is_regular, is_spiking],
                                   features_to_run=features_to_run,
                                   logger_level="error",
                                   strict=False,
@@ -277,7 +277,7 @@ def uq_medaka_1():
     parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4)
 
     # Initialize the features
-    features = un.SpikingFeatures(new_features=[bursting, spiking, APs],
+    features = un.SpikingFeatures(new_features=[is_bursting, is_regular, is_spiking],
                                   features_to_run=features_to_run,
                                   logger_level="error",
                                   strict=False,
@@ -342,7 +342,7 @@ def uq_medaka_2():
     parameters["g_BK"].distribution = cp.Uniform(0, 3.2e-4*4)
 
     # Initialize the features
-    features = un.SpikingFeatures(new_features=[bursting, spiking, APs],
+    features = un.SpikingFeatures(new_features=[is_bursting, is_regular, is_spiking],
                                   features_to_run=features_to_run,
                                   strict=False,
                                   logger_level="error",

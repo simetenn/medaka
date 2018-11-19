@@ -82,7 +82,7 @@ def burstiness(durations, burst_threshold=burst_threshold):
 
 
 
-def bursting(time, spikes, info):
+def is_bursting(time, spikes, info):
     """
     If the model has bursts or not. Is one if the model has at least one spike
     with duration longer than the burstiness threshold, else it is zero.
@@ -113,7 +113,7 @@ def bursting(time, spikes, info):
 
 
 
-def spiking(time, spikes, info):
+def is_regular(time, spikes, info):
     """
     If the model has spikes or not. Is one if the model has at least one spike
     with duration shorter than the burstiness threshold, else it is zero.
@@ -143,7 +143,7 @@ def spiking(time, spikes, info):
 
 
 
-def APs(time, spikes, info):
+def is_spiking(time, spikes, info):
     """
     If the model have action potentials or not. Is one if the model has at
     least one spike, else it is zero.
