@@ -24,7 +24,7 @@ UNITS {
 
 PARAMETER {
     fc = 0.01 (1): Fraction of Ca++ in cytoplasm
-    alpha = 0.00945 (mM*cm^2/muC) : Converted from Tabak 2011, Membrane area-dependent
+    alpha = 0.00471238905 (mM*cm^2/muC) : Converted from Tabak 2011, Membrane area-dependent
     kc = 0.12   (1/ms)  : From Tabak 2011
     Cainit  = 1e-4 (mM)	: Initial Ca-level
 }

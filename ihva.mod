@@ -35,10 +35,10 @@ PARAMETER {
 	eCa     = 60		(mV)
 	Cai 	= .00005	(mM)	: initial [Ca]i = 50 nM
 	Cao 	= 2		(mM)	: [Ca]o = 2 mM
-	pcabar	= 2e-4	(mho/cm2)
-    mmin=0.02
+	pcabar	= 9e-4	(mho/cm2)
+    	mmin=0.02	
     hmin=0.1
-
+    
     :  Cell B fitting traub
     pm1 = -0.1278
     pm2 = -46.7 (mV)
@@ -69,13 +69,13 @@ ASSIGNED {
 	taum	(ms)
 }
 
-BREAKPOINT {
+BREAKPOINT { 
 	SOLVE states METHOD cnexp
 	g = pcabar * m * m
 	iCa = g * ghk(v, Cai, Cao)
 }
 
-DERIVATIVE states {
+DERIVATIVE states { 
 	trates(v+vlj)
 	m' = (m_inf - m) / taum
 }
@@ -83,10 +83,10 @@ DERIVATIVE states {
 
 UNITSOFF
 
-PROCEDURE trates(vm) {
+PROCEDURE trates(vm) {  
         LOCAL  a, b, qt
 :        qt=q10^((celsius-24)/10)
-
+        
         a = trap1(vm, pm1, pm2, pm3)
         b = trap1(-vm, pm4, -pm5, pm6)
         taum = 1/(a+b)/100000
@@ -119,7 +119,7 @@ FUNCTION trap1(v,pa,pb,pc) {
 	} else {
 	        trap1 = pa*pc
  	}
-}
+}	
 UNITSON
 
 
