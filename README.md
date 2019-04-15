@@ -13,9 +13,8 @@ and all analysis of the models.
 
 The content of this folder is:
 
-* `medaka.py` - contains the Medaka model implementation as the functions `rat` for RAT, `medaka_1` for MEDAKA 1 and `medaka_2` for MEDAKA 2.
+* `medaka.py` - contains the Medaka model.
 * `burstines.py` - contains the functions for calculating the burstiness.
-* `analysis.py` - contains the analysis of the models.
 * `uq.py` - contains the uncertainty quantification and sensitivity analysis of the models.
 * `*.mod` - NEURON files that implements the various ion channels.
 * `platform_information.py` - prints platform information.
@@ -55,16 +54,6 @@ by the user.
 
 ## Running the code
 
-To create Figure 3 and Figure 4 in
-"BK channels have opposite effects on sodium versus calcium mediated action potentials in endocrine pituitary cells"
-run:
-
-```
-python analysis.py
-```
-
-This takes around 7 minutes on a workstation computer.
-
 To perform the uncertainty quantification and sensitivity analysis of the model
 run:
 
@@ -72,12 +61,10 @@ run:
 python uq.py
 ```
 
-This takes around 4 minutes on a workstation computer.
-
 
 ## Platform and package specifications
 
-All results have been generated inside a Docker environment with:
+The uncertainty quantification and sensitivity analysis results have been generated inside a Docker environment with:
 
 ```
 Platform: linux
