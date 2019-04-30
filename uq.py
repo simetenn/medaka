@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import string
 import os
 
-from burstiness import is_bursting, is_regular, is_spiking, min_spike_amplitude
+from burstiness import is_bursting, is_regular, is_not_spiking, min_spike_amplitude
 
 from uncertainpy.plotting.prettyplot.prettyplot import prettyBar, set_latex_font, set_style, spines_color, prettyPlot
 
@@ -22,8 +22,8 @@ figure_folder = "figures"
 
 
 # Uncertainty quantification parameters
-polynomial_order = 4
-features_to_run = ["is_regular", "is_bursting", "is_spiking"]
+polynomial_order = 6
+features_to_run = ["is_regular", "is_bursting", "is_not_spiking"]
 
 
 def plot_sobol_feature(data, feature, ax):
@@ -116,12 +116,12 @@ def plot(data):
     axes = axes[0]
 
     feature_labels = {
-        "is_bursting": "Isbursting",
-        "is_spiking": "Isspiking",
-        "is_regular": "Isregular"
+        "is_bursting": "IsBursting",
+        "is_not_spiking": "IsNotSpiking",
+        "is_regular": "IsRegular"
     }
 
-    features = ["is_bursting", "is_regular", "is_spiking"]
+    features = ["is_bursting", "is_regular", "is_not_spiking"]
 
     yticks = np.arange(0, 1.1, 0.25)
 
@@ -174,7 +174,7 @@ def uq_medaka():
     parameters["g_BK"].distribution = cp.Uniform(0, 1*10e-4)
 
     # Initialize the features
-    features = un.SpikingFeatures(new_features=[is_bursting, is_regular, is_spiking],
+    features = un.SpikingFeatures(new_features=[is_bursting, is_regular, is_not_spiking],
                                   features_to_run=features_to_run,
                                   logger_level="error",
                                   strict=False,
@@ -186,7 +186,7 @@ def uq_medaka():
 
 
     # Initialize the model and defining default options
-    model = un.NeuronModel(file="geir_Medaka.py",
+    model = un.NeuronModel(file="medaka.py",
                            name="medaka",
                            ignore=True)
 
@@ -199,7 +199,8 @@ def uq_medaka():
     data = UQ.quantify(seed=10,
                        filename="medaka",
                        polynomial_order=polynomial_order,
-                       save=True)
+                       save=True,
+                       plot=None)
 
     return data
 
@@ -207,5 +208,6 @@ def uq_medaka():
 if __name__ == "__main__":
     data = uq_medaka()
 
+    # To load previous data
     # data = un.Data("data/medaka.h5")
     plot(data)

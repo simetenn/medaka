@@ -143,10 +143,10 @@ def is_regular(time, spikes, info):
 
 
 
-def is_spiking(time, spikes, info):
+def is_not_spiking(time, spikes, info):
     """
-    If the model have action potentials or not. Is one if the model has at
-    least one spike, else it is zero.
+    If the model have action potentials or not. Is 1 if the model has no spikes,
+    else it is zero.
 
     Parameters
     ----------
@@ -163,8 +163,8 @@ def is_spiking(time, spikes, info):
     found_APs : int
         Is one if the model has at least one spike, else it is zero.
     """
-    found_APs = 0
-    if spikes.nr_spikes > 0:
-        found_APs = 1
+    no_APs = 0
+    if spikes.nr_spikes == 0:
+        no_APs = 1
 
-    return None, found_APs
+    return None, no_APs
