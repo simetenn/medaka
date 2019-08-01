@@ -4,10 +4,10 @@ import numpy as np
 import uncertainpy as un
 
 
-onset_threshold = 0.55          # fraction of the normalized voltage
-burst_threshold = 60            # ms
-end_threshold = -0.1            # Relative to the onset_threshold
-min_spike_amplitude = 10        # mV
+onset_threshold = 0.55    # fraction of the normalized voltage
+burst_threshold = 60      # ms
+end_threshold = -0.1      # Relative to the onset_threshold
+min_spike_amplitude = 10  # mV
 
 
 def duration(time, voltage):
@@ -31,13 +31,15 @@ def duration(time, voltage):
     Normalizes the voltage before the spikes are calculated.
     """
     # Find spikes in the normalized voltage trace
-    spikes = un.features.Spikes(time,
-                                voltage,
-                                threshold=onset_threshold,
-                                end_threshold=end_threshold,
-                                trim=False,
-                                normalize=True,
-                                min_amplitude=min_spike_amplitude)
+    spikes = un.features.Spikes(
+        time,
+        voltage,
+        threshold=onset_threshold,
+        end_threshold=end_threshold,
+        trim=False,
+        normalize=True,
+        min_amplitude=min_spike_amplitude,
+    )
 
     # Calculate the duration of each spike
     duration = []
@@ -45,7 +47,6 @@ def duration(time, voltage):
         duration.append(spike.time[-1] - spike.time[0])
 
     return np.array(duration)
-
 
 
 def burstiness(durations, burst_threshold=burst_threshold):
@@ -76,10 +77,9 @@ def burstiness(durations, burst_threshold=burst_threshold):
     burst_occurrences = durations > burst_threshold
 
     # Calculate the fraction of these events
-    burstiness_factor = np.sum(burst_occurrences)/len(burst_occurrences)
+    burstiness_factor = np.sum(burst_occurrences) / len(burst_occurrences)
 
     return burstiness_factor
-
 
 
 def is_bursting(time, spikes, info):
@@ -112,7 +112,6 @@ def is_bursting(time, spikes, info):
     return None, found_bursts
 
 
-
 def is_regular(time, spikes, info):
     """
     If the model has spikes or not. Is one if the model has at least one spike
@@ -140,7 +139,6 @@ def is_regular(time, spikes, info):
             break
 
     return None, found_spike
-
 
 
 def is_not_spiking(time, spikes, info):
