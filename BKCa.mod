@@ -18,7 +18,7 @@ PARAMETER {
         v (mV)
 	iCa (mA)
         ntau = 20 (ms)
-	AA = 0.3768
+	AA = 1.21
 }
 
 

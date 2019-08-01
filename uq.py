@@ -158,12 +158,12 @@ def uq_medaka():
         A data object that contains the results from the uncertainty
         quantification of the rat model.
     """
-    parameters = {"g_K": 1.4*9.55e-4,
-                  "g_Ca": 2e-4,
-                  "g_SK": 2*6.4e-4,
-                  "g_l": 0.64e-4,
-                  "g_BK": 1*10e-4,
-                  "g_Na": 0.07}
+    parameters = {"g_K": 4.18e-4,
+                  "g_Ca": 6.25e-5,
+                  "g_SK": 4e-4,
+                  "g_l": 2e-5,
+                  "g_BK": 3.13e-4,
+                  "g_Na": 2.19e-2}
     parameters = un.Parameters(parameters)
 
     # Set all parameters to have a uniform distribution
@@ -171,7 +171,7 @@ def uq_medaka():
     parameters.set_all_distributions(un.uniform(1))
 
     # Set full g_BK distribution
-    parameters["g_BK"].distribution = cp.Uniform(0, 1*10e-4)
+    parameters["g_BK"].distribution = cp.Uniform(0, 3.13e-4)
 
     # Initialize the features
     features = un.SpikingFeatures(new_features=[is_bursting, is_regular, is_not_spiking],

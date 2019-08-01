@@ -35,7 +35,7 @@ def create_soma(g_l=0.064e-3,
 
     for sec in nrn.allsec():
         sec.Ra = 100
-        sec.cm = 3.2
+        sec.cm = 1.0
         sec.insert('pas')
         sec.insert("kdrt")                 # From Tabak 2011
         sec.insert("Cadt")                 # From Tabak 2011:
@@ -50,7 +50,7 @@ def create_soma(g_l=0.064e-3,
 
 
         for seg in sec:
-            seg.alpha_Cadt = 0.00471238905
+            seg.alpha_Cadt = 1.51e-2
             seg.g_pas = g_l
             seg.e_pas = e_pas
             seg.gkdrbar_kdrt = g_K # med kun kdrt & nax er 0.001 og 0.05 fine tall
@@ -60,6 +60,7 @@ def create_soma(g_l=0.064e-3,
             seg.gbar_naxm = gbar_naxm
             seg.ntau_bk = tau_BK
             seg.taun_kdrt = tau_K
+            seg.AA_bk = 1.21
 
     return soma
 
@@ -124,13 +125,13 @@ simulation_time = 16000        # in ms
 noise_amplitude = 0*0.001            # in mV
 
 epasval = -45 # Tabak value -50
-glval = 0.64e-4 # Tabak value 0.64e-4
-Kval = 1.4*9.55e-4 # Tabak value 9.55e-4
-SKval	= 2*6.4e-4 # Tabak-value 6.4e-4: increase to reduce firing rate
+glval = 2e-5 # Tabak value 0.64e-4
+Kval = 4.18e-4 # Tabak value 9.55e-4
+SKval	= 4e-4 # Tabak-value 6.4e-4: increase to reduce firing rate
 tauKval = 5 #
-CaFishval = 2e-4 # Tabak-value was 6.4e-4, but different kinetics
-Naval = 0.07 # Not part of Tabak-model
-BKdef = 1*10e-4 #
+CaFishval = 6.25e-5 # Tabak-value was 6.4e-4, but different kinetics
+Naval = 2.19e-2 # Not part of Tabak-model
+BKdef = 3.13e-4 #
 tauBKval = 3 # Tau for BK-near. Duncan had 20 ms
 
 
