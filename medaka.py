@@ -19,13 +19,13 @@ plt.show()
 
 
 def create_soma(
-    g_l=0.064e-3,
+    g_l=2e-5,
     e_pas=-45,
-    g_K=1.3e-3,
+    g_K=4.18e-4,
     pcabar_ihva=0.2e-3,
-    g_SK=0.32e-3,
-    g_BK=1e-3,
-    gbar_naxm=0.07,
+    g_SK=4e-4,
+    g_BK=3.13e-4,
+    gbar_naxm=2.19e-2,
     tau_BK=3,
     tau_K=5,
 ):
@@ -237,8 +237,6 @@ if __name__ == "__main__":
             t6, v6, ca6 = t, v, ca
 
     fig = plt.figure(23)
-    # plt.rc('text', usetex=True)
-    # plt.gcf().text(0.02, 0.9, "Fish Gon.", fontsize=14)
 
     ax1 = fig.add_subplot(6, 3, (1, 2), xlabel="", ylabel="$V_m$ [mV]", title="A1")
     ax2 = fig.add_subplot(6, 3, 3, xlabel="", ylabel="", title="A2")
@@ -264,7 +262,6 @@ if __name__ == "__main__":
 
     ax1.plot(t6, v6, "tab:red", label="$g_{Na}=0$")
 
-    # ax2.plot(t0, v0, 'tab:blue', label='control')
     ax2.plot(t0, v0, "tab:blue", label="control")
     ax2.plot(t6, v6, "tab:red", label="$g_{Na}=0$")
     ax1.legend(loc=1)
@@ -292,13 +289,6 @@ if __name__ == "__main__":
     ax12.plot(t5, v5, "tab:blue", label="$g_{BK}\cdot$ 0")
     ax11.legend(loc=1)
 
-    # ax1.set_xlim([3000,13000])
-    # ax3.set_xlim([3000,13000])
-    # ax5.set_xlim([3000,13000])
-    # ax7.set_xlim([3000,13000])
-    # ax9.set_xlim([3000,13000])
-    # ax11.set_xlim([3000,13000])
-
     ax2.set_xlim([0, 150])
     ax4.set_xlim([0, 150])
     ax6.set_xlim([0, 150])
@@ -306,13 +296,9 @@ if __name__ == "__main__":
     ax10.set_xlim([0, 150])
     ax12.set_xlim([0, 150])
 
-    # ax3.set_xlim([0,160])
-    # ax4.set_xlim([0,400])
-
     ax1.set_ylim([-70, 10])
     ax2.set_ylim([-70, 10])
     ax3.set_ylim([-70, 10])
-    # ax4.set_ylim([-70,10])
 
     ax1.set_xticks([])
     ax2.set_xticks([])
@@ -328,11 +314,9 @@ if __name__ == "__main__":
     fig.subplots_adjust(hspace=0.4)
     fig.subplots_adjust(wspace=0.4)
 
-    # plt.legend(loc=4, frameon=False)
     plt.savefig("medakasim.png")
 
     fig = plt.figure(4)
-    # plt.rc('text', usetex=True)
     plt.gcf().text(0.02, 0.9, "MEDAKA 2$", fontsize=14)
 
     ax1 = fig.add_subplot(

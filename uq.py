@@ -90,7 +90,6 @@ def plot_sobol_feature(data, feature, ax):
             tick.set_rotation(-40)
 
         ax.set_ylim([0, 1.15])
-        # ax.set_title(title, fontsize=titlesize)
         ax.text(
             0.25,
             0.9,
@@ -123,7 +122,6 @@ def plot(data):
     set_style(style)
     set_latex_font()
 
-    # plt.rcParams.update({"axes.titlepad": 12})
     fig, axes = plt.subplots(
         nrows=1,
         ncols=3,
